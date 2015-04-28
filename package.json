@@ -4,6 +4,7 @@
 	"description": "React Router wrapper that allows async initial data loading and can use async-dispatcher's dispatcher and data source to handle actions and load data.",
 	"main": "lib/index.js",
 	"dependencies": {
+		"async-dispatcher": "file:../async-dispatcher",
 		"babel": "*"
 	},
 	"devDependencies": {
