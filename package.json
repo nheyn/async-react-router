@@ -1,0 +1,18 @@
+{
+	"name": "async-flux-router",
+	"version": "0.1.0",
+	"description": "React Router wrapper that allows async initial data loading and can use async-dispatcher's dispatcher and data source to handle actions and load data.",
+	"main": "lib/index.js",
+	"dependencies": {
+		"babel": "*"
+	},
+	"devDependencies": {
+		"babel-jest": "*",
+		"jest-cli": "*"
+	},
+	"scripts": {
+		"test": "jest",
+		"prepublish": "babel ./src/ -d ./lib/"
+	},
+	"author": "Nick Heyn <nick@heyn.io>"
+}
