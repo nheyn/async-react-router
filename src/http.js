@@ -100,8 +100,14 @@ ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
 };
 
 ReactRouterRequestHandler.prototype.handleError = function(err: Error) {
-	//TODO, send http error
-	//TODO, close response
+	//TODO, create response based on error
+	this._response.writeHead(500, {'Content-Type': 'application/json'});
+	this._response.write(JSON.stringify({
+		errors: [
+			{type: 'InternalServerError', message: 'NYI'},
+		]
+	}));
+	this._response.end();
 };
 
 /*------------------------------------------------------------------------------------------------*/
