@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-var http = require('http');
+var http: any = require('http'); //NOTE, needs any because 'http.createServer' isn't defined by flow
 
 type ReactHttpSettings = {}; //TODO, define needed/optional settings
 
