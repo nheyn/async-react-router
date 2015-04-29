@@ -2,8 +2,20 @@
  * @flow
  */
 var http: any = require('http'); //NOTE, needs any because 'http.createServer' isn't defined by flow
+var fs = require('fs');
+var path = require('path');
 
-type ReactHttpSettings = {}; //TODO, define needed/optional settings
+type ReactHttpSettings = {
+	staticFileDirectory: string;
+};
+
+/*------------------------------------------------------------------------------------------------*/
+//	--- Constants ---
+/*------------------------------------------------------------------------------------------------*/
+var STATICS_URI = '/statics';
+var LOOKUP_URI = '/lookup';
+var ACTION_URI = '/action';
+
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
@@ -40,15 +52,21 @@ ReactRouterRequestHandler.prototype.handleRequest = function() {
 	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
 	
 	// Check type of request	//TODO, allow pages called statics, lookup and/or action
-	if(urlStartsWith('/statics'))		this.handleStaticFile();
-	else if(urlStartsWith('/lookup'))	this.handleLookup();
-	else if(urlStartsWith('/action'))	this.handleAction();
+	if(urlStartsWith(STATICS_URI))		this.handleStaticFile();
+	else if(urlStartsWith(LOOKUP_URI))	this.handleLookup();
+	else if(urlStartsWith(ACTION_URI))	this.handleAction();
 	else								this.handleInitalPageLoad();
 };
 
 ReactRouterRequestHandler.prototype.handleStaticFile = function() {
-	//TODO, Get static file
-	//TODO, close response
+	// Get static file
+	var fileName = this._request.url.substring(STATICS_URI.length);
+	var readStream = fs.createReadStream(
+		path.join(this._severSettings.staticFileDirectory, fileName)
+	);
+	readStream
+		.on('open', () => readStream.pipe(this._request, true)) //NOTE, true is for flowtype
+		.on('error', (err) => this.handleError(err));
 };
 
 ReactRouterRequestHandler.prototype.handleLookup = function() {
@@ -66,7 +84,7 @@ ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
 	//TODO, close response
 };
 
-ReactRouterRequestHandler.prototype.handleError = function(httpStatus: number) {
+ReactRouterRequestHandler.prototype.handleError = function(err: Error) {
 	//TODO, send http error
 	//TODO, close response
 };
