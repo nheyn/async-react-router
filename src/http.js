@@ -37,31 +37,36 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
 //	React Router Http Request Handler Methods
 /*------------------------------------------------------------------------------------------------*/
 ReactRouterRequestHandler.prototype.handleRequest = function() {
-	//TODO, check kind of request
-		//TODO, call request handler for type
+	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
+	
+	// Check type of request
+	if(urlStartsWith('/statics'))		this.handleStaticFile();
+	else if(urlStartsWith('/lookup'))	this.handleLookup();
+	else if(urlStartsWith('/action'))	this.handleAction();
+	else								this.handleInitalPageLoad();
 };
 
-ReactRouterRequestHandler.prototype.staticFilesRequestHandler = function() {
+ReactRouterRequestHandler.prototype.handleStaticFile = function() {
 	//TODO, handle requests for static files
 	//TODO, close response
 };
 
-ReactRouterRequestHandler.prototype.lookupDataRequestHandler = function() {
+ReactRouterRequestHandler.prototype.handleLookup = function() {
 	//TODO, handle request for data
 	//TODO, close response
 };
 
-ReactRouterRequestHandler.prototype.actionRequestHandler = function() {
+ReactRouterRequestHandler.prototype.handleAction = function() {
 	//TODO, handle action
 	//TODO, close response
 };
 
-ReactRouterRequestHandler.prototype.initalPageRequestHandler = function() {
+ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
 	//TODO, handle initial page load request (render react on server)
 	//TODO, close response
 };
 
-ReactRouterRequestHandler.prototype.onErrorRequestHandler = function(httpStatus: number) {
+ReactRouterRequestHandler.prototype.handleError = function(httpStatus: number) {
 	//TODO, send http error
 	//TODO, close response
 };
