@@ -3,19 +3,19 @@
  */
 var http = require('http');
 
-type HttpSettings = any; //TODO, define needed/optional settings
+type ReactHttpSettings = {}; //TODO, define needed/optional settings
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
 /*------------------------------------------------------------------------------------------------*/
-function createServer(settings: HttpSettings): HttpServer {
+function createServer(settings: ReactHttpSettings): HttpServer {
 	return http.createServer((request, response) => {
 		var requestHandler = new ReactRouterRequestHandler({
 			request: request,
 			response: response,
 			serverSettings: settings
 		});
-		handleRequest.handlerRequest();
+		requestHandler.handleRequest();
 	});
 }
 
@@ -23,10 +23,10 @@ function createServer(settings: HttpSettings): HttpServer {
 //	--- React Router Http Request Handler Class ---
 /*------------------------------------------------------------------------------------------------*/
 type ReactRouterRequestHandlerSettings = {
-	request: IncomingMessage,
-	response: OutgoingMessage,
-	serverSettings: HttpSettings
-}
+	request: HttpIncomingMessage,
+	response: HttpServerResponse,
+	serverSettings: ReactHttpSettings
+};
 function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
@@ -39,7 +39,7 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
 ReactRouterRequestHandler.prototype.handleRequest = function() {
 	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
 	
-	// Check type of request
+	// Check type of request	//TODO, allow pages called statics, lookup and/or action
 	if(urlStartsWith('/statics'))		this.handleStaticFile();
 	else if(urlStartsWith('/lookup'))	this.handleLookup();
 	else if(urlStartsWith('/action'))	this.handleAction();
@@ -47,7 +47,7 @@ ReactRouterRequestHandler.prototype.handleRequest = function() {
 };
 
 ReactRouterRequestHandler.prototype.handleStaticFile = function() {
-	//TODO, handle requests for static files
+	//TODO, Get static file
 	//TODO, close response
 };
 
