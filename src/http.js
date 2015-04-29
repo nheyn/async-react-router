@@ -4,6 +4,8 @@
 var http: any = require('http'); //NOTE, needs any because 'http.createServer' isn't defined by flow
 var fs = require('fs');
 var path = require('path');
+var AsyncReact = require('./asyncReact');
+var AsyncRouter = require('./asyncReactRouter');
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
@@ -17,7 +19,10 @@ var ACTION_URI = '/action';
 //	--- Create Server Function ---
 /*------------------------------------------------------------------------------------------------*/
 type ReactHttpSettings = {
+	route: ReactRouterRoute;
 	staticFileDirectory: string;
+	htmlTemplate: string;
+	props: {[key: string]: any};
 	lookupHandler?: HttpHandlerFunction;
 	actionHandler?: HttpHandlerFunction;
 };
@@ -110,8 +115,31 @@ ReactRouterRequestHandler.prototype.handleAction = function() {
  * //TODO
  */
 ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
-	//TODO, handle initial page load request (render react on server)
-	//TODO, close response
+	// Render the page for the current route
+	AsyncRouter.run(this._serverSettings.route, this._request.url, (Handler, state) => {
+		// Read File
+		var chunks = [];
+		var htmlStream = fs.createReadStream(
+			this._severSettings.htmlTemplate, 
+			{ encoding: 'utf8' }
+		);
+		htmlStream.on('data', (chunk) => { chunks.push(chunk); });
+		
+		// Render Element
+		var props = this._severSettings.props? this._severSettings.props: {}
+		AsyncReact.renderToString(<Handler {...props} />)
+			.then((reactHtml) => {
+				// Add rendered react to html file when both are completed
+				htmlStream.on('end', () => {
+					var htmlDoc = chunks.join('').replace('<react />', reactHtml);
+					this._response.write(htmlDoc); 
+					this._response.end();
+				});
+			})
+			.catch((err) => {
+				this.handleError(err);
+			});
+	});
 };
 
 /**
