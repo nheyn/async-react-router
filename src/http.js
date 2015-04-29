@@ -5,10 +5,6 @@ var http: any = require('http'); //NOTE, needs any because 'http.createServer' i
 var fs = require('fs');
 var path = require('path');
 
-type ReactHttpSettings = {
-	staticFileDirectory: string;
-};
-
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
 /*------------------------------------------------------------------------------------------------*/
@@ -20,6 +16,14 @@ var ACTION_URI = '/action';
 /*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
 /*------------------------------------------------------------------------------------------------*/
+type ReactHttpSettings = {
+	staticFileDirectory: string;
+	lookupHandler?: HttpHandlerFunction;
+	actionHandler?: HttpHandlerFunction;
+};
+/**
+ * //TODO
+ */
 function createServer(settings: ReactHttpSettings): HttpServer {
 	return http.createServer((request, response) => {
 		var requestHandler = new ReactRouterRequestHandler({
@@ -39,6 +43,9 @@ type ReactRouterRequestHandlerSettings = {
 	response: HttpServerResponse,
 	serverSettings: ReactHttpSettings
 };
+/**
+ * //TODO
+ */
 function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
@@ -70,13 +77,21 @@ ReactRouterRequestHandler.prototype.handleStaticFile = function() {
 };
 
 ReactRouterRequestHandler.prototype.handleLookup = function() {
-	//TODO, handle request for data
-	//TODO, close response
+	if(!this._severSettings.lookupHandler) {
+		this.handleError(new Error('Unable to do any lookups'));
+		return;
+	}
+
+	this._severSettings.lookupHandler(this._request, this._response);
 };
 
 ReactRouterRequestHandler.prototype.handleAction = function() {
-	//TODO, handle action
-	//TODO, close response
+	if(!this._severSettings.actionHandler) {
+		this.handleError(new Error('Unable to do any actions'));
+		return;
+	}
+
+	this._severSettings.actionHandler(this._request, this._response);
 };
 
 ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
