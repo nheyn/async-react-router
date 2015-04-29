@@ -55,6 +55,9 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
 /*------------------------------------------------------------------------------------------------*/
 //	React Router Http Request Handler Methods
 /*------------------------------------------------------------------------------------------------*/
+/**
+ * //TODO
+ */
 ReactRouterRequestHandler.prototype.handleRequest = function() {
 	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
 	
@@ -65,6 +68,9 @@ ReactRouterRequestHandler.prototype.handleRequest = function() {
 	else								this.handleInitalPageLoad();
 };
 
+/**
+ * //TODO
+ */
 ReactRouterRequestHandler.prototype.handleStaticFile = function() {
 	// Get static file
 	var fileName = this._request.url.substring(STATICS_URI.length);
@@ -76,6 +82,9 @@ ReactRouterRequestHandler.prototype.handleStaticFile = function() {
 		.on('error', (err) => this.handleError(err));
 };
 
+/**
+ * //TODO
+ */
 ReactRouterRequestHandler.prototype.handleLookup = function() {
 	if(!this._severSettings.lookupHandler) {
 		this.handleError(new Error('Unable to do any lookups'));
@@ -85,6 +94,9 @@ ReactRouterRequestHandler.prototype.handleLookup = function() {
 	this._severSettings.lookupHandler(this._request, this._response);
 };
 
+/**
+ * //TODO
+ */
 ReactRouterRequestHandler.prototype.handleAction = function() {
 	if(!this._severSettings.actionHandler) {
 		this.handleError(new Error('Unable to do any actions'));
@@ -94,11 +106,17 @@ ReactRouterRequestHandler.prototype.handleAction = function() {
 	this._severSettings.actionHandler(this._request, this._response);
 };
 
+/**
+ * //TODO
+ */
 ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
 	//TODO, handle initial page load request (render react on server)
 	//TODO, close response
 };
 
+/**
+ * //TODO
+ */
 ReactRouterRequestHandler.prototype.handleError = function(err: Error) {
 	//TODO, create response based on error
 	this._response.writeHead(500, {'Content-Type': 'application/json'});

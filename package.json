@@ -5,9 +5,11 @@
 	"author": "Nick Heyn <nick@heyn.io>",
 	"main": "lib/index.js",
 	"dependencies": {
+		"react": "*",
 		"babel": "*"
 	},
 	"devDependencies": {
+		"react-tools": "*",
 		"babel-jest": "*",
 		"jest-cli": "*"
 	},
