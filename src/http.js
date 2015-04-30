@@ -127,7 +127,7 @@ ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
 		
 		// Render Element
 		var props = this._severSettings.props? this._severSettings.props: {}
-		AsyncReact.renderToString(<Handler {...props} />)
+		AsyncReact.renderToString(<Handler {...props} />)	//ERROR, incorrect flow error
 			.then((reactHtml) => {
 				// Add rendered react to html file when both are completed
 				htmlStream.on('end', () => {

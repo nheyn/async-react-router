@@ -2,10 +2,11 @@ declare module "react-router" {
 	declare function run(routes: ReactRouterRoute, loc: any, callback: ReactRouterCallback): void;
 }
 
-declare class ReactRouterHandler<D, P, S> extends ReactComponent<D, P, S> {
+//ERROR, flow is acting as if ReactRouterHandlerClass doesn't extend ReactClass
+/*declare class ReactRouterHandlerClass<D, P, S> extends ReactClass<D, P, S> {
 	getAsyncInitialState: (props: {[key: string]: any}) => Promise<Object>;
-}
+}*/
 
-type ReactRouterRoute = any; //TODO
-type ReactRouterCallback = (Handler: ReactRouterHandler, state: ReactRouterState) => void;
+type ReactRouterRoute = ReactElement;
+type ReactRouterCallback = (Handler: ReactClass, state: ReactRouterState) => void; //TODO
 type ReactRouterState = any; //TODO
