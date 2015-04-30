@@ -5,7 +5,6 @@ FROM nheyn/async-react-router
 RUN npm install -g babel
 RUN babel /var/async-react-router/src -d /var/async-react-router/lib
 
-
 WORKDIR /var/www/
 COPY ./src /var/www/src/
 COPY ./package.json /var/www/

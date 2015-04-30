@@ -4,6 +4,7 @@
 var http: any = require('http'); //NOTE, needs any because 'http.createServer' isn't defined by flow
 var fs = require('fs');
 var path = require('path');
+var React = require('react');
 var AsyncReact = require('./asyncReact');
 var AsyncRouter = require('./asyncReactRouter');
 
@@ -137,7 +138,7 @@ ReactRouterRequestHandler.prototype._handleAction = function() {
  */
 ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
 	// Render the page for the current route
-	AsyncRouter.run(this._serverSettings.route, this._request.url, (Handler, state) => {
+	AsyncRouter.run(this._severSettings.route, this._request.url, (Handler, state) => {
 		// Read File
 		var chunks = [];
 		var htmlStream = fs.createReadStream(

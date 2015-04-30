@@ -11,6 +11,7 @@
 		"postuninstall": "rm ./src/index.es5.js"
 	},
 	"dependencies": {
+		"babel": "*",
 		"react": "*",
 		"react-router": "*",
 		"async-react-router": "file:/var/async-react-router/"

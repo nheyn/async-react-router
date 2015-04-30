@@ -6,5 +6,3 @@ COPY ./package.json /var/async-react-router/
 
 WORKDIR /var/async-react-router/
 RUN npm install
-
-EXPOSE 80

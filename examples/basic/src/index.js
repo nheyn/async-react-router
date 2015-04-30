@@ -1,23 +1,12 @@
+require("babel/polyfill");
+
+var path = require('path');
 var React = require('react');
 var Router = require('react-router');
 var Route = Router.Route;
+var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
 var Link = Router.Link;
-var reactHttp = require('async-react-router').http;
-
-reactHttp.createServer({
-	route() {
-		return (
-			<Route handler={Page}>
-				<DefaultRoute name="p1" handler={PageOne} />
-				<Route name="p2" handler={PageTwo} />
-				<Route name="p3" handler={PageThree} />
-			</Route>
-		);
-	},
-	staticFileDirectory: './statics/',
-	htmlTemplate: './template.html'
-}).listen(8080);
 
 // Handlers
 var Page = React.createClass({
@@ -76,3 +65,18 @@ var PageThree = React.createClass({
 		);
 	}
 });
+
+// Start server
+var reactHttp = require('async-react-router').http;
+
+reactHttp.createServer({
+	route: (
+			<Route path="/" handler={Page}>
+				<DefaultRoute name="p1" handler={PageOne} />
+				<Route name="p2" handler={PageTwo} />
+				<Route name="p3" handler={PageThree} />
+			</Route>
+	),
+	staticFileDirectory: path.join(__dirname, 'statics/'),
+	htmlTemplate: path.join(__dirname, 'template.html')
+}).listen(8080);
