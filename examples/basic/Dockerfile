@@ -6,15 +6,19 @@ RUN npm install -g babel
 RUN babel /var/async-react-router/src -d /var/async-react-router/lib
 
 WORKDIR /var/www/
-COPY ./src /var/www/src/
 COPY ./package.json /var/www/
-
-#BEACUSE npm install isn't working for ./package.json preinstall trigger isn't working
-RUN babel /var/www/src/index.js -o /var/www/src/index.es5.js
-#FOR v
-
 RUN npm install
 
-CMD node /var/www/src/index.es5.js
+#MOVE into index.js
+RUN npm install -g browserify
+RUN npm install babelify
+
+# Last to speed re-build speed
+COPY ./src /var/www/src/
+
+#MOVE into index.js
+RUN browserify ./src/app.js -t babelify --outfile ./src/statics/app.js
+
+CMD node /var/www/src/index.js
 
 EXPOSE 8080

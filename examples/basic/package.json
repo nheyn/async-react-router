@@ -4,11 +4,7 @@
 	"description": "React Router wrapper that allows async initial data loading.",
 	"author": "Nick Heyn <nick@heyn.io>",
 	"bin": {
-		"basic-site": "./src/index.es5.js"
-	},
-	"scripts": {
-		"preinstall": "babel ./src/index.js -o ./src/index.es5.js",
-		"postuninstall": "rm ./src/index.es5.js"
+		"basic-site": "./src/index.js"
 	},
 	"dependencies": {
 		"babel": "*",
