@@ -37,7 +37,7 @@ type ReactHttpSettings = {
 	route: ReactRouterRoute;
 	staticFileDirectory: string;
 	htmlTemplate: string;
-	props: {[key: string]: any};
+	props?: {[key: string]: any};
 	lookupHandler?: HttpHandlerFunction;
 	actionHandler?: HttpHandlerFunction;
 };

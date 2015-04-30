@@ -6,6 +6,7 @@
 	"main": "lib/index.js",
 	"dependencies": {
 		"react": "*",
+		"react-router": "*",
 		"babel": "*"
 	},
 	"devDependencies": {

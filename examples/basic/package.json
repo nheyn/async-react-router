@@ -1,0 +1,14 @@
+{
+	"name": "async-react-router-basic-site",
+	"version": "0.1.0",
+	"description": "React Router wrapper that allows async initial data loading.",
+	"author": "Nick Heyn <nick@heyn.io>",
+	"bin": {
+		"basic-site": "./src/index.js"
+	},
+	"dependencies": {
+		"react": "*",
+		"react-router": "*",
+		"async-flux-router": "file:/var/async-flux-router/"
+	}
+}

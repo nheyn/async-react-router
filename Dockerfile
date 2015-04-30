@@ -1,11 +1,10 @@
 FROM node:0.10
 
-COPY ./src /var/async-flux-router/src/
-COPY ./__tests__ /var/async-flux-router/__tests__/
-COPY ./package.json /var/async-flux-router/
+COPY ./src /var/async-react-router/src/
+COPY ./__tests__ /var/async-react-router/__tests__/
+COPY ./package.json /var/async-react-router/
 
-WORKDIR /var/www/
-RUN npm install /var/async-flux-router/
-#TODO, finish settings up www file for http server
+WORKDIR /var/async-react-router/
+RUN npm install
 
 EXPOSE 80
