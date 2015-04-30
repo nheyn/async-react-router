@@ -7,7 +7,14 @@ var React = require('react');
 //	Render functions
 /*------------------------------------------------------------------------------------------------*/
 /**
- * //TODO
+ * Wrapper function for React.render, which allows that initial state of the component to be loaded
+ * asynchronously.
+ *
+ * @param element	{ReactElement}				The React element to render
+ * @param container	{DOM}						The DOM container to render the element in
+ * 
+ * @return			{Promise<ReactComponent>}	A promise that calls .then after the initial state
+ *												is loaded and contains that value from React.render
  */
 function render(element: ReactElement, container: any): Promise<ReactComponent> {
 	return getInitalState(element)
@@ -23,7 +30,13 @@ function render(element: ReactElement, container: any): Promise<ReactComponent> 
 }
 
 /**
- * //TODO
+ * Wrapper function for React.renderToString, which allows that initial state of the component to be
+ * loaded asynchronously.
+ *
+ * @param element	{ReactElement}		The React element to render
+ *
+ * @return			{Promise<string>}	A promise that calls .then after the initial state is loaded
+ *										and contains that value from string React.renderToString
  */
 function renderToString(element: ReactElement): Promise<string> {
 	return getInitalState(element)
@@ -33,7 +46,14 @@ function renderToString(element: ReactElement): Promise<string> {
 }
 
 /**
- * //TODO
+ * Wrapper function for React.renderToString, which allows that initial state of the component to be
+ * loaded asynchronously.
+ *
+ * @param element	{ReactElement}		The React element to render
+ *
+ * @return			{Promise<string>}	A promise that calls .then after the initial state is loaded
+ *										and contains that value from string 
+ *										React.renderToStaticMarkup
  */
 function renderToStaticMarkup(element: ReactElement): Promise<string> {
 	return getInitalState(element)

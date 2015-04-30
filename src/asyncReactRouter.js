@@ -7,7 +7,16 @@ var Router = require('react-router');
 /*------------------------------------------------------------------------------------------------*/
 //	Run function
 /*------------------------------------------------------------------------------------------------*/
-function run(routes: any, location: any, callback: (Handler: any, state: any) => void) {
+/**
+ * Wrapper function for Router.run, which allows that initial state of the component to be loaded
+ * asynchronously.
+ *
+ * @param routes	{ReactRouterRoute}					The Route to render for
+ * @param location	{string | Router.HistoryLocation}	The uri, or how to get the uri
+ * @param callback	{ReactRouterCallback}				The the callback that should should contain
+ *														the code to render the current handler
+ */
+function run(routes: ReactRouterRoute, location: any, callback: ReactRouterCallback) {
 	Router.run(routes, location, (Handler, state) => {
 		// Get all handlers with getAsyncInitialState method in the current route
 		var asyncHandlers = state.routes

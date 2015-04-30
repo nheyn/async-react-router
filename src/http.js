@@ -18,6 +18,21 @@ var ACTION_URI = '/action';
 /*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
 /*------------------------------------------------------------------------------------------------*/
+/**
+ * Create a new http server to serve a React Router Website.
+ *
+ * @param settings	{ReactHttpSettings}	The settings for the server
+ *			route 				{ReactRouterRoute}		The react router root for the site
+ *			staticFileDirectory	{string}				The directory that contains static files
+ *			htmlTemplate 		{string}				The file that contains the html template
+ *															where '<react />' is replaced with the
+ *															component rendered for the root
+ *			props				{[key: string]: any}	The props to send to the Handlers
+ *			lookupHandler?: 	{HttpHandlerFunction}	A function to call when data is requested by
+ *														the client
+ *			actionHandler?: 	{HttpHandlerFunction}	A function to call when an action is
+ *														preformed by the client
+ */
 type ReactHttpSettings = {
 	route: ReactRouterRoute;
 	staticFileDirectory: string;
@@ -26,9 +41,6 @@ type ReactHttpSettings = {
 	lookupHandler?: HttpHandlerFunction;
 	actionHandler?: HttpHandlerFunction;
 };
-/**
- * //TODO
- */
 function createServer(settings: ReactHttpSettings): HttpServer {
 	return http.createServer((request, response) => {
 		var requestHandler = new ReactRouterRequestHandler({
@@ -43,14 +55,20 @@ function createServer(settings: ReactHttpSettings): HttpServer {
 /*------------------------------------------------------------------------------------------------*/
 //	--- React Router Http Request Handler Class ---
 /*------------------------------------------------------------------------------------------------*/
-type ReactRouterRequestHandlerSettings = {
-	request: HttpIncomingMessage,
-	response: HttpServerResponse,
-	serverSettings: ReactHttpSettings
-};
 /**
- * //TODO
+ * A class that handles a http request for the react-router server.
+ *
+ * @param settings	{ReactRouterRequestHandler}	The settings for the request handler
+ *			request			{HttpIncomingMessage}	The http request to handle
+ *			response		{HttpServerResponse}	The http response to send results to
+ *			serverSettings	{ReactHttpSetting}		The settings for react-router server
+ *														(see createServer documentation for details)
  */
+type ReactRouterRequestHandlerSettings = {
+	request: HttpIncomingMessage;
+	response: HttpServerResponse;
+	serverSettings: ReactHttpSettings;
+};
 function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
@@ -61,22 +79,25 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
 //	React Router Http Request Handler Methods
 /*------------------------------------------------------------------------------------------------*/
 /**
- * //TODO
+ * Handle the request given in the constructor.
  */
 ReactRouterRequestHandler.prototype.handleRequest = function() {
 	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
 	
 	// Check type of request	//TODO, allow pages called statics, lookup and/or action
-	if(urlStartsWith(STATICS_URI))		this.handleStaticFile();
-	else if(urlStartsWith(LOOKUP_URI))	this.handleLookup();
-	else if(urlStartsWith(ACTION_URI))	this.handleAction();
-	else								this.handleInitalPageLoad();
+	if(urlStartsWith(STATICS_URI))		this._handleStaticFile();
+	else if(urlStartsWith(LOOKUP_URI))	this._handleLookup();
+	else if(urlStartsWith(ACTION_URI))	this._handleAction();
+	else								this._handleInitalPageLoad();
 };
 
+/*------------------------------------------------------------------------------------------------*/
+//	React Router Http Request Handler 'Private' Methods
+/*------------------------------------------------------------------------------------------------*/
 /**
- * //TODO
+ * Handle a request for a static file.
  */
-ReactRouterRequestHandler.prototype.handleStaticFile = function() {
+ReactRouterRequestHandler.prototype._handleStaticFile = function() {
 	// Get static file
 	var fileName = this._request.url.substring(STATICS_URI.length);
 	var readStream = fs.createReadStream(
@@ -88,9 +109,9 @@ ReactRouterRequestHandler.prototype.handleStaticFile = function() {
 };
 
 /**
- * //TODO
+ * Handle a request for data lookup.
  */
-ReactRouterRequestHandler.prototype.handleLookup = function() {
+ReactRouterRequestHandler.prototype._handleLookup = function() {
 	if(!this._severSettings.lookupHandler) {
 		this.handleError(new Error('Unable to do any lookups'));
 		return;
@@ -100,9 +121,9 @@ ReactRouterRequestHandler.prototype.handleLookup = function() {
 };
 
 /**
- * //TODO
+ * Handle a client side action.
  */
-ReactRouterRequestHandler.prototype.handleAction = function() {
+ReactRouterRequestHandler.prototype._handleAction = function() {
 	if(!this._severSettings.actionHandler) {
 		this.handleError(new Error('Unable to do any actions'));
 		return;
@@ -112,9 +133,9 @@ ReactRouterRequestHandler.prototype.handleAction = function() {
 };
 
 /**
- * //TODO
+ * Handle an initial page load request.
  */
-ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
+ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
 	// Render the page for the current route
 	AsyncRouter.run(this._serverSettings.route, this._request.url, (Handler, state) => {
 		// Read File
@@ -143,9 +164,11 @@ ReactRouterRequestHandler.prototype.handleInitalPageLoad = function() {
 };
 
 /**
- * //TODO
+ * Handle the given error, send appropriate response to client.
+ *
+ * @param error {Error}	The error to handle
  */
-ReactRouterRequestHandler.prototype.handleError = function(err: Error) {
+ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
 	//TODO, create response based on error
 	this._response.writeHead(500, {'Content-Type': 'application/json'});
 	this._response.write(JSON.stringify({
@@ -160,3 +183,4 @@ ReactRouterRequestHandler.prototype.handleError = function(err: Error) {
 //	--- Exports ---
 /*------------------------------------------------------------------------------------------------*/
 module.exports.createServer = createServer;
+module.exports.ReactRouterRequestHandler = ReactRouterRequestHandler;
