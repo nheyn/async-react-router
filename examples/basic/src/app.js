@@ -2,7 +2,8 @@ require("babel/polyfill");
 
 var React = require('react');
 var Router = require('react-router');
-var route = require('./route.js').route;
+var { route } = require('./route.js');
+var { React: AsyncReact, Router: AsyncRouter } = require('async-react-router');
 
 // Render the page for the given route
 window.onload = () => {

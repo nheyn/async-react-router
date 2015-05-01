@@ -11,6 +11,7 @@ var AsyncRouter = require('./asyncReactRouter');
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
 /*------------------------------------------------------------------------------------------------*/
+var APP_URI = '/app.js';
 var STATICS_URI = '/statics';
 var LOOKUP_URI = '/lookup';
 var ACTION_URI = '/action';
@@ -85,7 +86,11 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
 ReactRouterRequestHandler.prototype.handleRequest = function() {
 	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
 	
-	// Check type of request	//TODO, allow pages called statics, lookup and/or action
+	//TODO
+	/*if(urlStartsWith('/app.js'))		this._handleClientAppRequest();
+	else*/ 
+
+	// Check type of request
 	if(urlStartsWith(STATICS_URI))		this._handleStaticFile();
 	else if(urlStartsWith(LOOKUP_URI))	this._handleLookup();
 	else if(urlStartsWith(ACTION_URI))	this._handleAction();
@@ -96,17 +101,22 @@ ReactRouterRequestHandler.prototype.handleRequest = function() {
 //	React Router Http Request Handler 'Private' Methods
 /*------------------------------------------------------------------------------------------------*/
 /**
+ * Handle a request for the client side javascript for this app.
+ *
+ReactRouterRequestHandler.prototype._handleClientAppRequest = function() {
+	this._sendStaticFile('./app.js', this._response);
+};//*/
+
+/**
  * Handle a request for a static file.
  */
 ReactRouterRequestHandler.prototype._handleStaticFile = function() {
-	// Get static file
+	// Get file Path
 	var fileName = this._request.url.substring(STATICS_URI.length);
-	var readStream = fs.createReadStream(
-		path.join(this._severSettings.staticFileDirectory, fileName)
-	);
-	readStream
-		.on('open', () => readStream.pipe(this._request, true)) //NOTE, true is for flowtype
-		.on('error', (err) => this.handleError(err));
+	var filePath = path.join(this._severSettings.staticFileDirectory, fileName);
+
+	// Send File
+	this._sendStaticFile(filePath, this._response);
 };
 
 /**
@@ -178,6 +188,13 @@ ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
 		]
 	}));
 	this._response.end();
+};
+
+ReactRouterRequestHandler.prototype._sendStaticFile = function(filePath: string) {
+	var readStream = fs.createReadStream(filePath);
+	readStream
+		.on('open', () => readStream.pipe(this._response, true)) //NOTE, true is for flowtype
+		.on('error', (err) => this._handleError(err));
 };
 
 /*------------------------------------------------------------------------------------------------*/

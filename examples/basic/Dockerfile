@@ -17,6 +17,7 @@ RUN npm install babelify
 COPY ./src /var/www/src/
 
 #MOVE into index.js
+RUN mkdir ./src/statics
 RUN browserify ./src/app.js -t babelify --outfile ./src/statics/app.js
 
 CMD node /var/www/src/index.js

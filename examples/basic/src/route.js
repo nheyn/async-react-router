@@ -1,9 +1,5 @@
 var React = require('react');
-var Router = require('react-router');
-var RouteHandler = Router.RouteHandler;
-var Link = Router.Link;
-var Route = Router.Route;
-var DefaultRoute = Router.DefaultRoute;
+var  { RouteHandler, Link, Route, DefaultRoute } = require('react-router');
 
 // Test Site's Handlers
 var Page = React.createClass({

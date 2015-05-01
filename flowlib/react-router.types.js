@@ -8,5 +8,5 @@ declare module "react-router" {
 }*/
 
 type ReactRouterRoute = ReactElement;
-type ReactRouterCallback = (Handler: ReactClass, state: ReactRouterState) => void; //TODO
+type ReactRouterCallback<D,P,S> = (Handler: ReactClass<D,P,S>, state: ReactRouterState) => void;
 type ReactRouterState = any; //TODO
