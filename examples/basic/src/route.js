@@ -14,7 +14,7 @@ var Page = React.createClass({
 						<li><Link to="p3">P3</Link></li>
 					</ul>
 				</nav>
-				<RouteHandler initialState={this.props.initialState} />
+				<RouteHandler {... this.props} />
 			</div>
 		);
 	}
@@ -22,10 +22,10 @@ var Page = React.createClass({
 
 var PageOne = React.createClass({
 	statics: {
-		getAsyncInitialState() {
-			return {
-				article: 'Page one content'
-			};
+		getAsyncInitialState(props) {
+			return props.dataSource? 
+					props.dataSource.getData({from: 'ds1'}):
+					{};
 		}
 	},
 	getInitialState() {
@@ -46,12 +46,24 @@ var PageOne = React.createClass({
 });
 
 var PageTwo = React.createClass({
+	statics: {
+		getAsyncInitialState(props) {
+			return props.dataSource? 
+					props.dataSource.getDataAsync({from: 'ds2'}):
+					Promise.resolve({});
+		}
+	},
+	getInitialState() {
+		return this.props.initialState && this.props.initialState.PageTwo?
+				this.props.initialState.PageTwo:
+				{};
+	},
 	render() {
 		return (
 			<div>
 				<h4>Page Two Header</h4>
 				<article>
-					Page two content...
+					{this.state.article? this.state.article: 'NO DATA'}
 				</article>
 			</div>
 		);
@@ -59,12 +71,24 @@ var PageTwo = React.createClass({
 });
 
 var PageThree = React.createClass({
+	statics: {
+		getAsyncInitialState(props) {
+			return props.dataSource? 
+					props.dataSource.getDataAsync({from: 'ds3'}):
+					Promise.resolve({});
+		}
+	},
+	getInitialState() {
+		return this.props.initialState && this.props.initialState.PageThree?
+				this.props.initialState.PageThree:
+				{};
+	},
 	render() {
 		return (
 			<div>
 				<h4>Page Three Header</h4>
 				<article>
-					Page three content...
+					{this.state.article? this.state.article: 'NO DATA'}
 				</article>
 			</div>
 		);
