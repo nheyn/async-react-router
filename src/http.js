@@ -147,7 +147,7 @@ ReactRouterRequestHandler.prototype._handleAction = function() {
  * Handle an initial page load request.
  */
 ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
-	// Render the page for the current route
+	// Get Handler for the current route
 	AsyncRouter.run(this._severSettings.route, this._request.url, (Handler, state) => {
 		// Read File
 		var chunks = [];
@@ -169,6 +169,7 @@ ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
 				});
 			})
 			.catch((err) => {
+				console.log('Render Error: ', err);
 				this.handleError(err);
 			});
 	});

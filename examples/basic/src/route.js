@@ -14,19 +14,31 @@ var Page = React.createClass({
 						<li><Link to="p3">P3</Link></li>
 					</ul>
 				</nav>
-				<RouteHandler />
+				<RouteHandler initialState={this.props.initialState} />
 			</div>
 		);
 	}
 });
 
 var PageOne = React.createClass({
+	statics: {
+		getAsyncInitialState() {
+			return {
+				article: 'Page one content'
+			};
+		}
+	},
+	getInitialState() {
+		return this.props.initialState && this.props.initialState.PageOne?
+				this.props.initialState.PageOne:
+				{};
+	},
 	render() {
 		return (
 			<div>
 				<h4>Page One Header</h4>
 				<article>
-					Page one content...
+					{this.state.article? this.state.article: 'NO DATA'}
 				</article>
 			</div>
 		);

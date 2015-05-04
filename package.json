@@ -10,7 +10,6 @@
 		"babel": "*"
 	},
 	"devDependencies": {
-		"react-tools": "*",
 		"babel-jest": "*",
 		"jest-cli": "*"
 	},
