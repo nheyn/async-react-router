@@ -22,6 +22,7 @@ var Page = React.createClass({
 
 var PageOne = React.createClass({
 	statics: {
+		// INITIAL DATA, use local synchronous data
 		getAsyncInitialState(props) {
 			return props.dataSource? 
 					props.dataSource.getData({from: 'ds1'}):
@@ -47,6 +48,7 @@ var PageOne = React.createClass({
 
 var PageTwo = React.createClass({
 	statics: {
+		// INITIAL DATA, use local asynchronous data
 		getAsyncInitialState(props) {
 			return props.dataSource? 
 					props.dataSource.getDataAsync({from: 'ds2'}):
@@ -72,6 +74,7 @@ var PageTwo = React.createClass({
 
 var PageThree = React.createClass({
 	statics: {
+		// INITIAL DATA, use data from the sever(asynchronously)
 		getAsyncInitialState(props) {
 			return props.lookup?
 					props.lookup({from: 'ds3'}): 
@@ -88,10 +91,31 @@ var PageThree = React.createClass({
 			<div>
 				<h4>Page Three Header</h4>
 				<article>
-					{this.state.article? this.state.article: 'NO DATA'}
+					<textarea 
+						value={this.state.article? this.state.article: 'NO DATA'}
+						ref="articleText"
+						onChange={this.updateLocal}
+					/>																		{/**/}
+					<button onClick={this.updateServer}>Save</button>
 				</article>
 			</div>
 		);
+	},
+	getArticleTextValue() {
+		var node = React.findDOMNode(this.refs.articleText);
+		return node.value;
+	},
+	updateLocal() {
+		this.setState({article: this.getArticleTextValue()});
+	},
+	updateServer() {
+		var payload = {
+			actionType: 'a3',
+			data: {article: this.getArticleTextValue()}
+		};
+		this.props.dispatch(payload)
+			.then(() => this.props.lookup({from: 'ds3'}))
+			.then((newState) => this.setState(newState));
 	}
 });
 
