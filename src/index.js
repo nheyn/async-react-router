@@ -1,10 +1,12 @@
 /**
  * @flow
  */
+import http from './http';
+import React from './asyncReact';
+import Router from './asyncReactRouter';
 
-/*------------------------------------------------------------------------------------------------*/
-//	--- Exports ---
-/*------------------------------------------------------------------------------------------------*/
-module.exports.http = require('./http');
-module.exports.React = require('./asyncReact');
-module.exports.Router = require('./asyncReactRouter');
+export {
+	http,
+	React,
+	Router
+};

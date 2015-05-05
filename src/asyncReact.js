@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-var React = require('react');
+import React from require('react');
 
 /*------------------------------------------------------------------------------------------------*/
 //	Render functions
@@ -16,7 +16,7 @@ var React = require('react');
  * @return			{Promise<ReactComponent>}	A promise that calls .then after the initial state
  *												is loaded and contains that value from React.render
  */
-function render(element: ReactElement, container: any): Promise<ReactComponent> {
+export function render(element: ReactElement, container: any): Promise<ReactComponent> {
 	return getInitialState(element)
 			.then(
 				(initialState) => React.cloneElement(element, { initialState })
@@ -55,7 +55,7 @@ function renderToString(element: ReactElement): Promise<string> {
  *										and contains that value from string 
  *										React.renderToStaticMarkup
  */
-function renderToStaticMarkup(element: ReactElement): Promise<string> {
+export function renderToStaticMarkup(element: ReactElement): Promise<string> {
 	return getInitialState(element)
 			.then((initialState) => {
 				return React.renderToStaticMarkup(React.cloneElement(element, { initialState }));
@@ -65,7 +65,7 @@ function renderToStaticMarkup(element: ReactElement): Promise<string> {
 /*------------------------------------------------------------------------------------------------*/
 //	Helper functions
 /*------------------------------------------------------------------------------------------------*/
-function getInitialState(element: ReactElement): Promise {
+export function getInitialState(element: ReactElement): Promise {
 	if(!element.type.getAsyncInitialState) return Promise.reject(new Error('No Initial State'));
 	
 	var asyncInitialState = element.type.getAsyncInitialState(element.props);
@@ -94,10 +94,3 @@ function getInitialState(element: ReactElement): Promise {
 		});
 	});
 }
-
-/*------------------------------------------------------------------------------------------------*/
-//	Exports
-/*------------------------------------------------------------------------------------------------*/
-module.exports.render = render;
-module.exports.renderToString = renderToString;
-module.exports.renderToStaticMarkup = renderToStaticMarkup;

@@ -1,12 +1,12 @@
 /**
  * @flow
  */
-var http: any = require('http'); //NOTE, needs any because 'http.createServer' isn't defined by flow
-var fs = require('fs');
-var path = require('path');
-var React = require('react');
-var AsyncReact = require('./asyncReact');
-var AsyncRouter = require('./asyncReactRouter');
+import http from 'http';
+import fsfrom 'fs';
+import pathfrom 'path';
+import Reactfrom 'react';
+import AsyncReactfrom './asyncReact';
+import AsyncRouterfrom './asyncReactRouter';
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
@@ -43,7 +43,7 @@ type ReactHttpSettings = {
 	lookupHandler?: HttpHandlerFunction;
 	actionHandler?: HttpHandlerFunction;
 };
-function createServer(settings: ReactHttpSettings): HttpServer {
+export function createServer(settings: ReactHttpSettings): HttpServer {
 	return http.createServer((request, response) => {
 		var requestHandler = new ReactRouterRequestHandler({
 			request: request,
@@ -71,7 +71,7 @@ type ReactRouterRequestHandlerSettings = {
 	response: HttpServerResponse;
 	serverSettings: ReactHttpSettings;
 };
-function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
+export function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
 	this._severSettings = settings.serverSettings;
@@ -197,9 +197,3 @@ ReactRouterRequestHandler.prototype._sendStaticFile = function(filePath: string)
 		.on('open', () => readStream.pipe(this._response, true)) //NOTE, true is for flowtype
 		.on('error', (err) => this._handleError(err));
 };
-
-/*------------------------------------------------------------------------------------------------*/
-//	--- Exports ---
-/*------------------------------------------------------------------------------------------------*/
-module.exports.createServer = createServer;
-module.exports.ReactRouterRequestHandler = ReactRouterRequestHandler;
