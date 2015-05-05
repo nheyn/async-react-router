@@ -73,9 +73,9 @@ var PageTwo = React.createClass({
 var PageThree = React.createClass({
 	statics: {
 		getAsyncInitialState(props) {
-			return props.dataSource? 
-					props.dataSource.getDataAsync({from: 'ds3'}):
-					Promise.resolve({});
+			return props.lookup?
+					props.lookup({from: 'ds3'}): 
+					Promise.reject(new Error('No lookup function to use'));
 		}
 	},
 	getInitialState() {
