@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------------------------*/
 //	--- Simple Dispatcher ---
 /*------------------------------------------------------------------------------------------------*/
-function Dispatcher(dataSource) {
+export default function Dispatcher(dataSource) {
 	this._dataSource = dataSource;
 }
 

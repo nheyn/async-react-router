@@ -1,10 +1,12 @@
 require('babel/polyfill');
 
-var React = require('react');
-var Router = require('react-router');
-var { route } = require('./route.js');
-var { React: AsyncReact, Router: AsyncRouter } = require('async-react-router');
-var DataSource = require('./dataSource.js');
+import React from 'react';
+import Router from 'react-router';
+import AsyncReactRouter from 'async-react-router';
+import { route } from './route.js';
+import DataSource from './dataSource.js';
+
+var { React: AsyncReact, Router: AsyncRouter } = AsyncReactRouter;
 
 // Sever connection
 var send = (url, payload, errorMessage = 'Ajax Error') => {
