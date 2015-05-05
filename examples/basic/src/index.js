@@ -3,7 +3,7 @@ require("babel/register");
 var url = require('url');
 var path = require('path');
 var React = require('react');
-var reactHttp = require('async-react-router').http;
+var AsyncRouter = require('async-react-router');
 var route = require('./route.js').route;
 var DataSource = require('./dataSource.js');
 var Dispatcher = require('./dispatcher.js');
@@ -22,7 +22,7 @@ var dispatch = function(payload) {
 
 
 // Start server
-reactHttp.createServer({
+AsyncRouter.http.createServer({
 	route: route,
 	staticFileDirectory: path.join(__dirname, 'statics/'),
 	htmlTemplate: path.join(__dirname, 'template.html'),

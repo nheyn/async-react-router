@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-import React from require('react');
+import React from 'react';
 
 /*------------------------------------------------------------------------------------------------*/
 //	Render functions
@@ -65,7 +65,7 @@ export function renderToStaticMarkup(element: ReactElement): Promise<string> {
 /*------------------------------------------------------------------------------------------------*/
 //	Helper functions
 /*------------------------------------------------------------------------------------------------*/
-export function getInitialState(element: ReactElement): Promise {
+function getInitialState(element: ReactElement): Promise {
 	if(!element.type.getAsyncInitialState) return Promise.reject(new Error('No Initial State'));
 	
 	var asyncInitialState = element.type.getAsyncInitialState(element.props);

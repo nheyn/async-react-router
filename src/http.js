@@ -2,11 +2,11 @@
  * @flow
  */
 import http from 'http';
-import fsfrom 'fs';
-import pathfrom 'path';
-import Reactfrom 'react';
-import AsyncReactfrom './asyncReact';
-import AsyncRouterfrom './asyncReactRouter';
+import fs from 'fs';
+import path from 'path';
+import React from 'react';
+import AsyncReact from './asyncReact';
+import AsyncRouter from './asyncReactRouter';
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
