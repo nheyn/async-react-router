@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------------------------*/
 //	--- Simple Data Source ---
 /*------------------------------------------------------------------------------------------------*/
-export default function DataSource() {
+function DataSource() {
 	this._onUpdate = null;
 	this._dataStores = {
 		'ds1': {article: 'Page one content (from Data Source)'},
@@ -29,3 +29,8 @@ DataSource.prototype.on = function(event, callback) {
 	if(event !== 'update') return;
 	this._onUpdate = callback;
 };
+
+/*------------------------------------------------------------------------------------------------*/
+//	--- Exports ---
+/*------------------------------------------------------------------------------------------------*/
+module.exports = DataSource;

@@ -1,5 +1,5 @@
-import React from 'react';
-import { RouteHandler, Link, Route, DefaultRoute } from 'react-router';
+var React = require('react');
+var { RouteHandler, Link, Route, DefaultRoute } = require('react-router');
 
 // Test Site's Handlers
 var Page = React.createClass({
