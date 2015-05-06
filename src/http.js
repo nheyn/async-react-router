@@ -1,15 +1,12 @@
 /**
  * @flow
  */
-import http from 'http';
-import fs from 'fs';
-import path from 'path';
-import React from 'react';
-import AsyncReact from './asyncReact.js';
-import AsyncRouter from './asyncReactRouter.js';
-
-console.log('AsyncRouter', AsyncRouter);
-console.log('AsyncReact', AsyncReact);
+var http = require('http');
+var fs = require('fs');
+var path = require('path');
+var React = require('react');
+var AsyncReact = require('./asyncReact.js');
+var AsyncRouter = require('./asyncReactRouter.js');
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
@@ -18,7 +15,6 @@ var APP_URI = '/app.js';
 var STATICS_URI = '/statics';
 var LOOKUP_URI = '/lookup';
 var ACTION_URI = '/action';
-
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
@@ -46,7 +42,7 @@ type ReactHttpSettings = {
 	lookupHandler?: HttpHandlerFunction;
 	actionHandler?: HttpHandlerFunction;
 };
-export function createServer(settings: ReactHttpSettings): HttpServer {
+function createServer(settings: ReactHttpSettings): HttpServer {
 	return http.createServer((request, response) => {
 		var requestHandler = new ReactRouterRequestHandler({
 			request: request,
@@ -74,7 +70,7 @@ type ReactRouterRequestHandlerSettings = {
 	response: HttpServerResponse;
 	serverSettings: ReactHttpSettings;
 };
-export function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
+function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
 	this._severSettings = settings.serverSettings;
@@ -200,3 +196,9 @@ ReactRouterRequestHandler.prototype._sendStaticFile = function(filePath: string)
 		.on('open', () => readStream.pipe(this._response, true)) //NOTE, true is for flowtype
 		.on('error', (err) => this._handleError(err));
 };
+
+/*------------------------------------------------------------------------------------------------*/
+//	Exports
+/*------------------------------------------------------------------------------------------------*/
+module.exports.createServer = createServer;
+module.exports.ReactRouterRequestHandler = ReactRouterRequestHandler;

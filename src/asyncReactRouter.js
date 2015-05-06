@@ -1,8 +1,8 @@
 /**
  * @flow
  */
-import React from 'react';
-import Router from 'react-router';
+var React = require('react');
+var Router = require('react-router');
 
 /*------------------------------------------------------------------------------------------------*/
 //	Run function
@@ -16,7 +16,7 @@ import Router from 'react-router';
  * @param callback	{ReactRouterCallback}				The the callback that should should contain
  *														the code to render the current handler
  */
-export function run(route: ReactRouterRoute, location: any, callback: ReactRouterCallback) {
+function run(route: ReactRouterRoute, location: any, callback: ReactRouterCallback) {
 	Router.run(route, location, (Handler, state) => {
 		// Get all handlers with getAsyncInitialState method in the current route
 		var asyncHandlers = state.routes
@@ -46,3 +46,8 @@ export function run(route: ReactRouterRoute, location: any, callback: ReactRoute
 		callback(Handler, state);
 	});
 }
+
+/*------------------------------------------------------------------------------------------------*/
+//	Exports
+/*------------------------------------------------------------------------------------------------*/
+module.exports.run = run;

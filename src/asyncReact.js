@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-import React from 'react';
+var React = require('react');
 
 /*------------------------------------------------------------------------------------------------*/
 //	Render functions
@@ -16,7 +16,7 @@ import React from 'react';
  * @return			{Promise<ReactComponent>}	A promise that calls .then after the initial state
  *												is loaded and contains that value from React.render
  */
-export function render(element: ReactElement, container: any): Promise<ReactComponent> {
+function render(element: ReactElement, container: any): Promise<ReactComponent> {
 	return getInitialState(element)
 			.then(
 				(initialState) => React.cloneElement(element, { initialState })
@@ -55,7 +55,7 @@ function renderToString(element: ReactElement): Promise<string> {
  *										and contains that value from string 
  *										React.renderToStaticMarkup
  */
-export function renderToStaticMarkup(element: ReactElement): Promise<string> {
+function renderToStaticMarkup(element: ReactElement): Promise<string> {
 	return getInitialState(element)
 			.then((initialState) => {
 				return React.renderToStaticMarkup(React.cloneElement(element, { initialState }));
@@ -94,3 +94,10 @@ function getInitialState(element: ReactElement): Promise {
 		});
 	});
 }
+
+/*------------------------------------------------------------------------------------------------*/
+//	Exports
+/*------------------------------------------------------------------------------------------------*/
+module.exports.render = render;
+module.exports.renderToString = renderToString;
+module.exports.renderToStaticMarkup = renderToStaticMarkup;
