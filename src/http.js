@@ -5,8 +5,11 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import React from 'react';
-import AsyncReact from './asyncReact';
-import AsyncRouter from './asyncReactRouter';
+import AsyncReact from './asyncReact.js';
+import AsyncRouter from './asyncReactRouter.js';
+
+console.log('AsyncRouter', AsyncRouter);
+console.log('AsyncReact', AsyncReact);
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Constants ---
