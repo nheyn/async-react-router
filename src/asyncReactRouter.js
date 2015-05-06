@@ -5,7 +5,7 @@ var React = require('react');
 var Router = require('react-router');
 
 /*------------------------------------------------------------------------------------------------*/
-//	Run function
+//	--- Run function ---
 /*------------------------------------------------------------------------------------------------*/
 /**
  * Wrapper function for Router.run, which allows that initial state of the component to be loaded
@@ -48,6 +48,6 @@ function run(route: ReactRouterRoute, location: any, callback: ReactRouterCallba
 }
 
 /*------------------------------------------------------------------------------------------------*/
-//	Exports
+//	--- Exports ---
 /*------------------------------------------------------------------------------------------------*/
 module.exports.run = run;

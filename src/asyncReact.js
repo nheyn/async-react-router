@@ -4,7 +4,7 @@
 var React = require('react');
 
 /*------------------------------------------------------------------------------------------------*/
-//	Render functions
+//	--- Render functions ---
 /*------------------------------------------------------------------------------------------------*/
 /**
  * Wrapper function for React.render, which allows that initial state of the component to be loaded
@@ -63,7 +63,7 @@ function renderToStaticMarkup(element: ReactElement): Promise<string> {
 }
 
 /*------------------------------------------------------------------------------------------------*/
-//	Helper functions
+//	--- Helper functions ---
 /*------------------------------------------------------------------------------------------------*/
 function getInitialState(element: ReactElement): Promise {
 	if(!element.type.getAsyncInitialState) return Promise.reject(new Error('No Initial State'));
@@ -96,7 +96,7 @@ function getInitialState(element: ReactElement): Promise {
 }
 
 /*------------------------------------------------------------------------------------------------*/
-//	Exports
+//	--- Exports ---
 /*------------------------------------------------------------------------------------------------*/
 module.exports.render = render;
 module.exports.renderToString = renderToString;

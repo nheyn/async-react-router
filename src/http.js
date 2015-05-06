@@ -198,7 +198,7 @@ ReactRouterRequestHandler.prototype._sendStaticFile = function(filePath: string)
 };
 
 /*------------------------------------------------------------------------------------------------*/
-//	Exports
+//	--- Exports ---
 /*------------------------------------------------------------------------------------------------*/
 module.exports.createServer = createServer;
 module.exports.ReactRouterRequestHandler = ReactRouterRequestHandler;
