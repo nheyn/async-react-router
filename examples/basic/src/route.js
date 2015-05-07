@@ -69,7 +69,7 @@ var PageTwo = React.createClass({
 
 var PageThree = React.createClass({
 	statics: {
-		// INITIAL DATA, use data from the sever(asynchronously)
+		// INITIAL DATA, use data from the server(asynchronously)
 		getAsyncInitialState(props) {
 			return props.lookup?
 					props.lookup({from: 'ds3'}): 
