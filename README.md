@@ -3,10 +3,13 @@
 
 ###Usage
 Add the static function, *getAsyncInitialState(props)*, to a react class. 
-This function will be passed the initial props and should return a promise that contains an object or an object that (may)contains Promises as it values. 
+This function will be passed the initial props and should return a promise that contains an object or an object that (may)contains Promises as it values.
+
 Using the wrapper function (see bellow) and the AsyncInitialStateMixin as a mixin will set the state of the component before it is rendered.
 Only works on the root component passed to the render function.
-Using AsyncReactRouter.run will 
+Using *AsyncReactRouter.run()* will call *getAsyncInitialState(props)* for each Handler in the current route.
+The *this.prop.initalState* will need to passed to each **Router.RouteHandler** for this to work (TODO: make this happen automatically).
+
 Any unhanded error will be in the promise returned by one of the wrapper functions.
 
 ###Wrapper Functions
@@ -28,7 +31,7 @@ TODO: Get documentation from code
 * Get documentation from code
 * Send correct MIME type for static files
 * Add support for /favicon.ico
-* Create wrapper for Router.RouteHandler that automatically send the initialState
+* Create wrapper for **Router.RouteHandler** that automatically send the initialState
 * Generate app.js (see /examples/basic/src/app.js) in *createServer()* function
 * Get ES6 modules working (see es6-modules branch)
 
