@@ -10,11 +10,9 @@ var React = require('react');
  * A mixin to add to components that get their initial state using the static getAsyncInitialState
  * method.
  */
-type AsyncInitialStateMixinType = {
-	getInitalState: () => {[key: string]: any};
-};
+type AsyncInitialStateMixinType = { getInitalState: () => {[key: string]: any}; };
 var AsyncInitialStateMixin: AsyncInitialStateMixinType = {
-	getInitalState() {
+	getInitialState() {
 		return this.props.initialState? this.props.initialState: {};
 	}
 };

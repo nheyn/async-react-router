@@ -29,7 +29,7 @@ function run(route: ReactRouterRoute, location: any, callback: ReactRouterCallba
 
 		// Add getAsyncInitialState method to the to level handler
 		Handler.getAsyncInitialState = (props) => {
-			return Promise.all( asyncHandlers.map((def) => def.getAsyncInitialState(props)) )
+			return Promise.all( asyncHandlers.map((handler) => handler.getAsyncInitialState(props)))
 					.then((resultsArray) => {
 						var resultsObj = {};
 						resultsArray.forEach((result, i) => {
