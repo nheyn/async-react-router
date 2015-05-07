@@ -1,9 +1,10 @@
 var React = require('react');
-var { RouteHandler, Link, Route, DefaultRoute } = require('react-router');
-var { AsyncInitialStateMixin } = require('async-react-router');
+var { Link, Route, DefaultRoute } = require('react-router');
+var { AsyncInitialStateHandlerMixin } = require('async-react-router');
 
 // Test Site's Handlers
 var Page = React.createClass({
+	mixins: [AsyncInitialStateHandlerMixin],
 	render() {
 		return (
 			<div>
@@ -15,7 +16,7 @@ var Page = React.createClass({
 						<li><Link to="p3">P3</Link></li>
 					</ul>
 				</nav>
-				<RouteHandler {... this.props} />
+				{this.getSubRouteHandler(this.props)}
 			</div>
 		);
 	}
@@ -30,14 +31,13 @@ var PageOne = React.createClass({
 					{};
 		}
 	},
-	mixins: [AsyncInitialStateMixin],
+	mixins: [AsyncInitialStateHandlerMixin],
 	render() {
-		var state = this.state.PageOne;
 		return (
 			<div>
 				<h4>Page One Header</h4>
 				<article>
-					{state && state.article? state && state.article: 'NO DATA'}
+					{this.state.article? this.state.article: 'NO DATA'}
 				</article>
 			</div>
 		);
@@ -53,14 +53,13 @@ var PageTwo = React.createClass({
 					Promise.resolve({});
 		}
 	},
-	mixins: [AsyncInitialStateMixin],
+	mixins: [AsyncInitialStateHandlerMixin],
 	render() {
-		var state = this.state.PageTwo;
 		return (
 			<div>
 				<h4>Page Two Header</h4>
 				<article>
-					{state && state.article? state.article: 'NO DATA'}
+					{this.state.article? this.state.article: 'NO DATA'}
 				</article>
 			</div>
 		);
@@ -76,15 +75,14 @@ var PageThree = React.createClass({
 					Promise.reject(new Error('No lookup function to use'));
 		}
 	},
-	mixins: [AsyncInitialStateMixin],
+	mixins: [AsyncInitialStateHandlerMixin],
 	render() {
-		var state = this.state.PageThree;
 		return (
 			<div>
 				<h4>Page Three Header</h4>
 				<article>
 					<textarea 
-						value={state && state.article? state.article: 'NO DATA'}
+						value={this.state.article? this.state.article: 'NO DATA'}
 						ref="articleText"
 						onChange={this.updateLocal}
 					/>																		{/**/}
