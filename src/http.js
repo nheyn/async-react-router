@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-var http = require('http');
+var http: any = require('http'); //Because lib/node.js  is missing http.createServer
 var fs = require('fs');
 var path = require('path');
 var React = require('react');
