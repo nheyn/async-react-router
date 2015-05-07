@@ -2,5 +2,6 @@
  * @flow
  */
 module.exports.http = require('./http');
-module.exports.React = require('./asyncReact');
-module.exports.Router = require('./asyncReactRouter');
+module.exports.AsyncReact = require('./asyncReact');
+module.exports.AsyncRouter = require('./asyncReactRouter');
+module.exports.AsyncInitialStateMixin = require('./asyncInitialStateMixin');

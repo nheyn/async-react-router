@@ -1,5 +1,6 @@
 var React = require('react');
 var { RouteHandler, Link, Route, DefaultRoute } = require('react-router');
+var { AsyncInitialStateMixin } = require('async-react-router');
 
 // Test Site's Handlers
 var Page = React.createClass({
@@ -29,17 +30,14 @@ var PageOne = React.createClass({
 					{};
 		}
 	},
-	getInitialState() {
-		return this.props.initialState && this.props.initialState.PageOne?
-				this.props.initialState.PageOne:
-				{};
-	},
+	mixins: [AsyncInitialStateMixin],
 	render() {
+		var state = this.state.PageOne;
 		return (
 			<div>
 				<h4>Page One Header</h4>
 				<article>
-					{this.state.article? this.state.article: 'NO DATA'}
+					{state && state.article? state && state.article: 'NO DATA'}
 				</article>
 			</div>
 		);
@@ -55,17 +53,14 @@ var PageTwo = React.createClass({
 					Promise.resolve({});
 		}
 	},
-	getInitialState() {
-		return this.props.initialState && this.props.initialState.PageTwo?
-				this.props.initialState.PageTwo:
-				{};
-	},
+	mixins: [AsyncInitialStateMixin],
 	render() {
+		var state = this.state.PageTwo;
 		return (
 			<div>
 				<h4>Page Two Header</h4>
 				<article>
-					{this.state.article? this.state.article: 'NO DATA'}
+					{state && state.article? state.article: 'NO DATA'}
 				</article>
 			</div>
 		);
@@ -81,18 +76,15 @@ var PageThree = React.createClass({
 					Promise.reject(new Error('No lookup function to use'));
 		}
 	},
-	getInitialState() {
-		return this.props.initialState && this.props.initialState.PageThree?
-				this.props.initialState.PageThree:
-				{};
-	},
+	mixins: [AsyncInitialStateMixin],
 	render() {
+		var state = this.state.PageThree;
 		return (
 			<div>
 				<h4>Page Three Header</h4>
 				<article>
 					<textarea 
-						value={this.state.article? this.state.article: 'NO DATA'}
+						value={state && state.article? state.article: 'NO DATA'}
 						ref="articleText"
 						onChange={this.updateLocal}
 					/>																		{/**/}

@@ -2,7 +2,7 @@ require('babel/polyfill');
 
 var React = require('react');
 var Router = require('react-router');
-var { React: AsyncReact, Router: AsyncRouter } = require('async-react-router');
+var { AsyncReact, AsyncRouter } = require('async-react-router');
 var { route } = require('./route.js');
 var DataSource = require('./dataSource.js');
 
