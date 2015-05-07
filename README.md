@@ -2,13 +2,14 @@
 *Async wrapper functions for react and react router*
 
 ###Usage
-Add the static function, *getAsyncInitialState(props)*, to a react class. 
-This function will be passed the initial props and should return a promise that contains an object or an object that (may)contains Promises as it values.
+Add the static function, *getAsyncInitialState(props)*, and one of the mixins, **AsyncInitialStateMixin** or **AsyncInitialStateHandlerMixin**, to a react class. 
+This function will be passed the initial props and should return a promise that contains an object or an object that (may)contains Promises as its values.
 
-Using the wrapper function (see bellow) and the AsyncInitialStateMixin as a mixin will set the state of the component before it is rendered.
+Using the wrapper function (see bellow) and a mixin will set the state of the component before it is rendered.
 Only works on the root component passed to the render function.
+
 Using *AsyncReactRouter.run()* will call *getAsyncInitialState(props)* for each Handler in the current route.
-The *this.prop.initalState* will need to passed to each **Router.RouteHandler** for this to work (TODO: make this happen automatically).
+Must use the **AsyncInitialStateHandlerMixin** for this to work.
 
 Any unhanded error will be in the promise returned by one of the wrapper functions.
 
