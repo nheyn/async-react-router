@@ -12,8 +12,8 @@ var { RouteHandler } = require('react-router');
  * method.
  */
 type AsyncInitialStateHandlerMixinType = { 
-	getInitalState: () => {[key: string]: any}; 
-	getSubRouteHandler: (props: ?[key: string]: any}) => ReactElement;
+	getInitialState: () => {[key: string]: any}; 
+	getSubRouteHandler: (props?: {[key: string]: any}) => ReactElement;
 };
 var AsyncInitialStateHandlerMixin: AsyncInitialStateHandlerMixinType = {
 	getInitialState(): {[key: string]: any} {

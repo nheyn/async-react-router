@@ -1,5 +1,6 @@
 declare module "react-router" {
 	declare function run(routes: ReactRouterRoute, loc: any, callback: ReactRouterCallback): void;
+	declare var RouteHandler: any; //RouteHandler;
 }
 
 //ERROR, flow is acting as if ReactRouterHandlerClass doesn't extend ReactClass
