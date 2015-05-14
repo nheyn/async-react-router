@@ -35,7 +35,7 @@ TODO: Get documentation from code
 * Add support for /favicon.ico
 * Add support for /sitemap.xml
 * Remove *lookupHandler* and *actionHandler* and change to elements in the route.
-* Allow *createSever()* to take a request handler function that returns a settings object (which is currently the argument sent to *currentServer()*)
+* Allow *createSever()* to take a request handler function that returns a settings object (which is currently the argument sent to *createServer()*)
 * Generate app.js (see /examples/basic/src/app.js) in *createServer()* function
 * Get ES6 modules working (see es6-modules branch)
 
