@@ -26,6 +26,7 @@ var AsyncInitialStateHandlerMixin: AsyncInitialStateHandlerMixinType = {
 		var handlerProps = {};
 		for(var key in props) handlerProps[key] = props[key];
 		if(this.props.initialState) handlerProps.initialState = this.props.initialState;
+		if(this.props.error) handlerProps.error = this.props.error;
 
 		return <RouteHandler {...handlerProps} />;
 	}

@@ -123,7 +123,7 @@ ReactRouterRequestHandler.prototype._handleStaticFile = function() {
  */
 ReactRouterRequestHandler.prototype._handleLookup = function() {
 	if(!this._severSettings.lookupHandler) {
-		this.handleError(new Error('Unable to do any lookups'));
+		this._handleError(new Error('Unable to do any lookups'));
 		return;
 	}
 
@@ -135,7 +135,7 @@ ReactRouterRequestHandler.prototype._handleLookup = function() {
  */
 ReactRouterRequestHandler.prototype._handleAction = function() {
 	if(!this._severSettings.actionHandler) {
-		this.handleError(new Error('Unable to do any actions'));
+		this._handleError(new Error('Unable to do any actions'));
 		return;
 	}
 
@@ -169,7 +169,7 @@ ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
 			})
 			.catch((err) => {
 				console.log('Render Error: ', err);
-				this.handleError(err);
+				this._handleError(err);
 			});
 	});
 };
@@ -184,7 +184,7 @@ ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
 	this._response.writeHead(500, {'Content-Type': 'application/json'});
 	this._response.write(JSON.stringify({
 		errors: [
-			{type: 'InternalServerError', message: 'NYI'},
+			{type: 'InternalServerError', message: `Error Message: ${err.message}`},
 		]
 	}));
 	this._response.end();

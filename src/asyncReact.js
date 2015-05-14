@@ -18,17 +18,11 @@ var React = require('react');
  */
 function render(element: ReactElement, container: any): Promise<ReactComponent> {
 	return getInitialState(element)
-			.then(
-				(initialState) => React.cloneElement(element, { initialState })
-			)
-			.catch(
-				() => element // Render default element if there is any errors
-			)
-			.then(
-				(elemt) => React.render(elemt, container)
-			);
+			.then(	(initialState) =>	React.cloneElement(element, { initialState })		)
+			.catch(	(err) =>			React.cloneElement(element, { error: err.message })	)
+			.then(	(elemt) => 			React.render(elemt, container)						);
 }
-
+ 
 /**
  * Wrapper function for React.renderToString, which allows that initial state of the component to be
  * loaded asynchronously.
