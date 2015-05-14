@@ -10,6 +10,7 @@ Only works on the root component passed to the render function.
 
 Using *AsyncReactRouter.run()* will call *getAsyncInitialState(props)* for each Handler in the current route.
 Must use the **AsyncInitialStateHandlerMixin** for this to work.
+This mixin also adds the *getSubRouteHandler(props = {})* method, which should be used instead of <RouteHandler /> to render any Route Handler Component that uses **AsyncInitialStateHandlerMixin**.
 
 Any unhanded error will be in the promise returned by one of the wrapper functions.
 
@@ -32,7 +33,9 @@ TODO: Get documentation from code
 * Get documentation from code
 * Send correct MIME type for static files
 * Add support for /favicon.ico
-* Create wrapper for **Router.RouteHandler** that automatically send the initialState
+* Add support for /sitemap.xml
+* Remove *lookupHandler* and *actionHandler* and change to elements in the route.
+* Allow *createSever()* to take a request handler function that returns a settings object (which is currently the argument sent to *currentServer()*)
 * Generate app.js (see /examples/basic/src/app.js) in *createServer()* function
 * Get ES6 modules working (see es6-modules branch)
 
