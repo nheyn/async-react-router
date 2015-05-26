@@ -181,6 +181,7 @@ ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
  */
 ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
 	//TODO, create response based on error
+	console.log(err, err.stack);
 	this._response.writeHead(500, {'Content-Type': 'application/json'});
 	this._response.write(JSON.stringify({
 		errors: [
