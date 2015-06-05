@@ -25,9 +25,9 @@ var ACTION_URI = '/action';
  * @param settings	{ReactHttpSettings}	The settings for the server
  *			route 				{ReactRouterRoute}		The react router root for the site
  *			staticFileDirectory	{string}				The directory that contains static files
- *			htmlTemplate 		{string}				The file that contains the html template
- *															where '<react />' is replaced with the
- *															component rendered for the root
+ *			htmlTemplate 		{string}				The html template string, where '<react />'
+ *														is replaced with the component rendered for
+ *														the root
  *			props				{[key: string]: any}	The props to send to the Handlers
  *			lookupHandler?: 	{HttpHandlerFunction}	A function to call when data is requested by
  *														the client
@@ -148,24 +148,14 @@ ReactRouterRequestHandler.prototype._handleAction = function() {
 ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
 	// Get Handler for the current route
 	AsyncRouter.run(this._severSettings.route, this._request.url, (Handler, state) => {
-		// Read File
-		var chunks = [];
-		var htmlStream = fs.createReadStream(
-			this._severSettings.htmlTemplate, 
-			{ encoding: 'utf8' }
-		);
-		htmlStream.on('data', (chunk) => { chunks.push(chunk); });
-		
 		// Render Element
 		var props = this._severSettings.props? this._severSettings.props: {}
 		AsyncReact.renderToString(<Handler {...props} />)	//ERROR, incorrect flow error
 			.then((reactHtml) => {
 				// Add rendered react to html file when both are completed
-				htmlStream.on('end', () => {
-					var htmlDoc = chunks.join('').replace('<react />', reactHtml);
-					this._response.write(htmlDoc); 
-					this._response.end();
-				});
+				var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
+				this._response.write(htmlDoc); 
+				this._response.end();
 			})
 			.catch((err) => {
 				console.log('Render Error: ', err);
