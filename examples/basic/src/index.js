@@ -21,6 +21,18 @@ var dispatch = function(payload) {
 	return dispatcher.dispatch(payload);
 };
 
+// Error handling
+function handleError(request, response, err) {
+	console.log('Error[', request.url, ']: ', err, err.stack);
+	response.writeHead(500, {'Content-Type': 'application/json'});
+	response.write(JSON.stringify({
+		errors: [
+			{type: 'InternalServerError', message: 'Error Message: ' + err.message},
+		]
+	}));
+	response.end();
+}
+
 // Read Template File
 var readFile = new Promise(function(resolve, reject) {
 	var templateChuncks = [];
@@ -36,63 +48,52 @@ var readFile = new Promise(function(resolve, reject) {
 
 // Start server
 readFile.then(function(htmlTemplate) {
-	AsyncRouter.http.createServer({
-		htmlTemplate: htmlTemplate,
-		props: {
-			dataSource: dataSource,
-			lookup: lookup,
-			dispatch: dispatch
-		},
-		route: route.makeRoute({
-			lookupHandler: function(request, response) {
-				var queryChunks = [];
-				request.on('data', function(chunk) { queryChunks.push(chunk); });
-				request.on('end', function() {
-					var query = JSON.parse(queryChunks.join(''));
-					lookup(query)
-						.then(function(data) {
-							response.writeHead(200, {'Content-Type': 'application/json'});
-							response.write(JSON.stringify({
-								data: data
-							}));
-							response.end();
-						})
-						.catch(function(err) {
-							console.log('Lookup Error: ', err);
-							response.writeHead(500, {'Content-Type': 'application/json'});
-							response.write(JSON.stringify({
-								errors: [
-									{type: 'InternalServerError', message: 'Error performing lookup'},
-								]
-							}));
-							response.end();
-						});
-				});
+	AsyncRouter.http.createServer(function(req, res) {
+		return {
+			htmlTemplate: htmlTemplate,
+			props: {
+				dataSource: dataSource,
+				lookup: lookup,
+				dispatch: dispatch
 			},
-			actionHandler: function(request, response) {
-				var payloadChunks = [];
-				request.on('data', function(chunk) { payloadChunks.push(chunk); });
-				request.on('end', function() {
-					var payload = JSON.parse(payloadChunks.join(''));
-					dispatch(payload)
-						.then(function() {
-							// Send Success
-							response.writeHead(200);
-							response.end();
-						})
-						.catch(function(err) {
-							console.log('Action Error: ', err);
-							response.writeHead(500, {'Content-Type': 'application/json'});
-							response.write(JSON.stringify({
-								errors: [
-									{type: 'InternalServerError', message: 'Error performing lookup'},
-								]
-							}));
-							response.end();
-						});
-				});
-			}
-		})
+			handleError: handleError,
+			route: route.makeRoute({
+				lookupHandler: function(request, response) {
+					var queryChunks = [];
+					request.on('data', function(chunk) { queryChunks.push(chunk); });
+					request.on('end', function() {
+						var query = JSON.parse(queryChunks.join(''));
+						lookup(query)
+							.then(function(data) {
+								response.writeHead(200, {'Content-Type': 'application/json'});
+								response.write(JSON.stringify({
+									data: data
+								}));
+								response.end();
+							})
+							.catch(function(err) {
+								handleError(request, response, err);
+							});
+					});
+				},
+				actionHandler: function(request, response) {
+					var payloadChunks = [];
+					request.on('data', function(chunk) { payloadChunks.push(chunk); });
+					request.on('end', function() {
+						var payload = JSON.parse(payloadChunks.join(''));
+						dispatch(payload)
+							.then(function() {
+								// Send Success
+								response.writeHead(200);
+								response.end();
+							})
+							.catch(function(err) {
+								handleError(request, response, err);
+							});
+					});
+				}
+			})
+		};
 	}).listen(8080);
 }).catch(function(err) {
 	console.log('HTML Template Error:', err, err.stack);

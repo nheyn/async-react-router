@@ -22,31 +22,37 @@ var ACTION_URI = '/action';
 /**
  * Create a new http server to serve a React Router Website.
  *
- * @param settings	{ReactHttpSettings}	The settings for the server
+ * @param getSettings	{ReactHttpSettingsFunction}	A function that returns the server settings:
  *			route 				{ReactRouterRoute}		The react router root for the site
  *			htmlTemplate 		{string}				The html template string, where '<react />'
  *														is replaced with the component rendered for
  *														the root
  *			props				{[key: string]: any}	The props to send to the Handlers
+ *			handleError			{Function}				Called with errors emitted by the server
  */
 type ReactHttpSettings = {
 	route: ReactRouterRoute;
 	htmlTemplate: string;
+	handleError?: (request: HttpIncomingMessage, response: HttpServerResponse, err: Error) => void;
 	props?: {[key: string]: any};
 };
-function createServer(settings: ReactHttpSettings): HttpServer {
+function createServer(getSettings: ReactHttpSettingsFunction): HttpServer {
 	return http.createServer((request, response) => {
-		var requestHandler = new ReactRouterRequestHandler({
-			request: request,
-			response: response,
-			serverSettings: settings
-		});
-		requestHandler.handleRequest();
+		Promise.resolve(getSettings(request, response))
+			.then((settings) => {
+				var requestHandler = new ReactRouterRequestHandler({
+					request: request,
+					response: response,
+					serverSettings: settings? settings: {}
+				});
+				requestHandler.handleRequest();
+			})
+			.catch((err) => { throw err });
 	});
 }
 
 /*------------------------------------------------------------------------------------------------*/
-//	--- React Router Http Request Handler Class ---
+//	--- React Router Http Request Handler ---
 /*------------------------------------------------------------------------------------------------*/
 /**
  * A class that handles a http request for the react-router server.
@@ -77,37 +83,20 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
 ReactRouterRequestHandler.prototype.handleRequest = function() {
 	// Get Handler for the current route
 	AsyncRouter.run(this._severSettings.route, this._request.url, (Handler, state) => {
-		// 404 Error (maybe)
 		if(!state.routes || state.routes.length === 0) {
 			this._handleError(new Error('No route'));
 			return;
 		}
 
-		// Check if Handler is an Http Request Handler function
-		var InnerHandler = state.routes[state.routes.length-1].handler;
-		if(InnerHandler.isHttpRequestHandler) {
-			try{
-				InnerHandler.handle(this._request, this._response);
-			}
-			catch(err) {
-				this._handleError(err);
-			}
-			return;
+		// Check type of request
+		try {
+			var InnerHandler = state.routes[state.routes.length-1].handler;
+			if(InnerHandler.isHttpRequestHandler)	this._handleRequest(InnerHandler);
+			else									this._handleInitalPageLoad(Handler);
 		}
-
-		// Render Element
-		var props = this._severSettings.props? this._severSettings.props: {}
-		AsyncReact.renderToString(<Handler {...props} />)	//ERROR, incorrect flow error
-			.then((reactHtml) => {
-				// Add rendered react to html file when both are completed
-				var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
-				this._response.write(htmlDoc); 
-				this._response.end();
-			})
-			.catch((err) => {
-				console.log('Render Error: ', err);
-				this._handleError(err);
-			});
+		catch(err) {
+			this._handleError(err);
+		}
 	});
 };
 
@@ -115,20 +104,39 @@ ReactRouterRequestHandler.prototype.handleRequest = function() {
 //	React Router Http Request Handler 'Private' Methods
 /*------------------------------------------------------------------------------------------------*/
 /**
+ * Handle request handled by RequestHandlers.
+ */
+ReactRouterRequestHandler.prototype._handleRequest = function(InnerHandler: any) {
+	InnerHandler.handle(this._request, this._response);
+};
+
+/**
+ * Handle request for the initial page load.
+ */
+ReactRouterRequestHandler.prototype._handleInitalPageLoad = function(Handler: any) {
+	var props = this._severSettings.props? this._severSettings.props: {}
+	AsyncReact.renderToString(<Handler {...props} />)	//ERROR, incorrect flow error
+		.then((reactHtml) => {
+			// Add rendered react to html file when both are completed
+			var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
+			this._response.write(htmlDoc); 
+			this._response.end();
+		})
+		.catch((err) => {
+			console.log('Render Error: ', err);
+			this._handleError(err);
+		});
+};
+
+/**
  * Handle the given error, send appropriate response to client.
  *
  * @param error {Error}	The error to handle
  */
 ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
-	//TODO, create response based on error
-	console.log(err, err.stack);
-	this._response.writeHead(500, {'Content-Type': 'application/json'});
-	this._response.write(JSON.stringify({
-		errors: [
-			{type: 'InternalServerError', message: `Error Message: ${err.message}`},
-		]
-	}));
-	this._response.end();
+	if(!this._severSettings || this._severSettings.handleError) throw err;
+
+	this._severSettings.handleError(this._request, this._response, err);
 };
 
 /*------------------------------------------------------------------------------------------------*/
