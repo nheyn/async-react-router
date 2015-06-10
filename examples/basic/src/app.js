@@ -3,7 +3,7 @@ require('babel/polyfill');
 var React = require('react');
 var Router = require('react-router');
 var { AsyncReact, AsyncRouter } = require('async-react-router');
-var { route } = require('./route.js');
+var route = require('./route.js');
 var DataSource = require('./dataSource.js');
 
 // Sever connection
@@ -41,7 +41,8 @@ var dispatch = (payload) => send('/action', payload, 'Error performing action');
 
 // Render the page for the given route
 window.onload = () => {
-	AsyncRouter.run(route, Router.HistoryLocation, (Handler, state) => {
+	var currRoute = route.makeRoute({lookupHandler: () => null, actionHanlder: () => null});
+	AsyncRouter.run(currRoute, Router.HistoryLocation, (Handler, state) => {
 		var componentPromise = AsyncReact.render(
 			<Handler dataSource={new DataSource()} lookup={lookup} dispatch={dispatch} />,
 			document.getElementById('react-element')
