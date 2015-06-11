@@ -4,11 +4,14 @@ var AsyncReactRouter = require('async-react-router');
 
 // Test Site's Handlers
 var Page = React.createClass({
+	contextTypes: {
+        url: React.PropTypes.string.isRequired,
+    },
 	mixins: [AsyncReactRouter.AsyncInitialStateHandlerMixin],
 	render() {
 		return (
 			<div>
-				<h2>Site Heading</h2>
+				<h2>Site Heading: {this.context.url}</h2>
 				{/*<img alt="Some Image" src="/staticFiles?path=identicon.png" />*/}
 				<nav>
 					<ul>

@@ -27,14 +27,16 @@ var ACTION_URI = '/action';
  *			htmlTemplate 		{string}				The html template string, where '<react />'
  *														is replaced with the component rendered for
  *														the root
- *			props				{[key: string]: any}	The props to send to the Handlers
  *			handleError			{Function}				Called with errors emitted by the server
+ *			props				{?[key: string]: any}	The props to send to the outer Handler
+ *			context				{?[key: string]: any}	the context to send to the Components
  */
 type ReactHttpSettings = {
 	route: ReactRouterRoute;
 	htmlTemplate: string;
 	handleError?: (request: HttpIncomingMessage, response: HttpServerResponse, err: Error) => void;
 	props?: {[key: string]: any};
+	context?: {[key: string]: any};
 };
 function createServer(getSettings: ReactHttpSettingsFunction): HttpServer {
 	return http.createServer((request, response) => {
@@ -115,17 +117,21 @@ ReactRouterRequestHandler.prototype._handleRequest = function(InnerHandler: any)
  */
 ReactRouterRequestHandler.prototype._handleInitalPageLoad = function(Handler: any) {
 	var props = this._severSettings.props? this._severSettings.props: {}
-	AsyncReact.renderToString(<Handler {...props} />)	//ERROR, incorrect flow error
-		.then((reactHtml) => {
-			// Add rendered react to html file when both are completed
-			var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
-			this._response.write(htmlDoc); 
-			this._response.end();
-		})
-		.catch((err) => {
-			console.log('Render Error: ', err);
-			this._handleError(err);
-		});
+	var context = this._severSettings.context? this._severSettings.context: {};
+	
+	React.withContext(context, () => {		//TODO, change from .withContext to .getChildContext
+		AsyncReact.renderToString(<Handler {...props} />)
+			.then((reactHtml) => {
+				// Add rendered react to html file when both are completed
+				var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
+				this._response.write(htmlDoc); 
+				this._response.end();
+			})
+			.catch((err) => {
+				console.log('Render Error: ', err);
+				this._handleError(err);
+			});
+	});
 };
 
 /**

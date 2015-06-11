@@ -43,12 +43,14 @@ var dispatch = (payload) => send('/action', payload, 'Error performing action');
 window.onload = () => {
 	var currRoute = route.makeRoute({lookupHandler: () => null, actionHanlder: () => null});
 	AsyncRouter.run(currRoute, Router.HistoryLocation, (Handler, state) => {
-		var componentPromise = AsyncReact.render(
-			<Handler dataSource={new DataSource()} lookup={lookup} dispatch={dispatch} />,
-			document.getElementById('react-element')
-		);
-		componentPromise
-			.then(() => {/* If the component is needed */})
-			.catch((err) => { throw err });
+		React.withContext({url: window.location.pathname}, () => {
+			var componentPromise = AsyncReact.render(
+				<Handler dataSource={new DataSource()} lookup={lookup} dispatch={dispatch} />,
+				document.getElementById('react-element')
+			);
+			componentPromise
+				.then(() => {/* If the component is needed */})
+				.catch((err) => { throw err });
+		});
 	});
 };

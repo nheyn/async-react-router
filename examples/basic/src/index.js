@@ -56,6 +56,9 @@ readFile.then(function(htmlTemplate) {
 				lookup: lookup,
 				dispatch: dispatch
 			},
+			context: {
+				url: req.url
+			},
 			handleError: handleError,
 			route: route.makeRoute({
 				lookupHandler: function(request, response) {
