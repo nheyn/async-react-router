@@ -1,41 +1,38 @@
 #Async React Router
 *Async wrapper functions for react and react router*
 
-###Usage
-Add the static function, *getAsyncInitialState(props)*, and one of the mixins, **AsyncInitialStateMixin** or **AsyncInitialStateHandlerMixin**, to a react class. 
-This function will be passed the initial props and should return a promise that contains an object or an object that (may)contains Promises as its values.
-
-Using the wrapper function (see bellow) and a mixin will set the state of the component before it is rendered.
-Only works on the root component passed to the render function.
-
-Using *AsyncReactRouter.run()* will call *getAsyncInitialState(props)* for each Handler in the current route.
-Must use the **AsyncInitialStateHandlerMixin** for this to work.
-This mixin also adds the *getSubRouteHandler(props = {})* method, which should be used instead of <RouteHandler /> to render any Route Handler Component that uses **AsyncInitialStateHandlerMixin**.
-
-Any unhanded error will be in the promise returned by one of the wrapper functions.
-
 ###Wrapper Functions
 * Wrapper for React.render/.renderToString/.renderToStaticMarkup that allow Async Initial Data 
 * Wrapper for ReactRouter.run that allow Async Initial Data, when using React wrapper functions (see above)
 * Wrapper for http.createServer that creates a server for an isomorphic web apps (includes server side rendering for initial page load).
 
+###Usage
+Add the static function, *getAsyncInitialState(props)*, and one of the mixins, **AsyncInitialStateMixin** or **AsyncInitialStateHandlerMixin**, to a react class. 
+This function will be passed the initial props and should return a promise that contains the initial state.
+
+Using the wrapper function (see bellow) and one of the mixins, will set the state of the component before it is rendered.
+Only works on the root component passed to the render function, unless using *AsyncReactRouter.run()*.
+It will call *getAsyncInitialState(props)* for each of the Handlers in the current route when one of the *AsyncReact* render functions is called.
+Must use the **AsyncInitialStateHandlerMixin** for this to work.
+This mixin also adds the *getSubRouteHandler(props = {})* method, which should be used instead of *&lt;RouteHandler /&gt;* to render any Route Handler Component that also uses **AsyncInitialStateHandlerMixin**.
+
+The **AsyncReact** render functions can also be passed an extra argument (not in the **React** render functions) that takes an object, that will be put in *this.context.async*.
+The component given to the *AsyncReact* render functions, or the root route Handler if using *AsyncReactRouter.run()*, must use **AsyncContextHandlerMixin** for this to work.
+
+Any unhanded error will be in the promise returned by one of the wrapper functions.
+
 ###Example
-See /examples/basic/ for a simple example web site that uses .createServer
+See /examples/basic/ for a simple example web site that uses AsyncReactRouter.http.createServer
 
 ###Tests
-TODO: Issue using polyfill with jest (https://github.com/babel/babel-jest/issues/20)
+FIXED: Issue using polyfill with jest (https://github.com/babel/babel-jest/issues/20)
+TODO: Write the tests
 
 ###Documentation
 TODO: Get documentation from code
 
 ###Plans
-* Fix issue using polyfill with jest and create tests
+* Write tests
 * Get documentation from code
-* Send correct MIME type for static files
-* Add support for /favicon.ico
-* Add support for /sitemap.xml
-* Remove *lookupHandler* and *actionHandler* and change to elements in the route.
-* Allow *createSever()* to take a request handler function that returns a settings object (which is currently the argument sent to *createServer()*)
 * Generate app.js (see /examples/basic/src/app.js) in *createServer()* function
 * Get ES6 modules working (see es6-modules branch)
-
