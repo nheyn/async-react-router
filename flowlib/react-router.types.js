@@ -11,3 +11,6 @@ declare module "react-router" {
 type ReactRouterRoute = ReactElement;
 type ReactRouterCallback<D,P,S> = (Handler: ReactClass<D,P,S>, state: ReactRouterState) => void;
 type ReactRouterState = any; //TODO
+
+type ReactHttpSettingsFunction = (req: HttpIncomingMessage, res: HttpServerResponse)
+									=> ?MaybePromise<ReactHttpSettings>;

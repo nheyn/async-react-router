@@ -12,15 +12,19 @@ var React = require('react');
  *
  * @param element	{ReactElement}				The React element to render
  * @param container	{DOM}						The DOM container to render the element in
+ * @param context	{MaybePromise}				A promise that contains the context for elements
+ *												being rendered
  * 
- * @return			{Promise<ReactComponent>}	A promise that calls .then after the initial state
- *												is loaded and contains that value from React.render
+ * @return			{Promise<ReactComponent>}	A promise that contains the component returned from
+ *												React.render
  */
-function render(element: ReactElement, container: any): Promise<ReactComponent> {
-	return getInitialState(element)
-			.then(	(initialState) =>	React.cloneElement(element, { initialState })		)
-			.catch(	(err) =>			React.cloneElement(element, { error: err.message })	)
-			.then(	(elemt) => 			React.render(elemt, container)						);
+function render(element: ReactElement, container: any, context: ?MaybePromise)
+																		: Promise<ReactComponent> {
+	var contextPromise = Promise.resolve(context);
+	return getElementWithContextAndInitialState(element, contextPromise, getInitialState(element))
+		.then(
+			(elemt) => React.render(elemt, container)
+		);
 }
  
 /**
@@ -28,15 +32,18 @@ function render(element: ReactElement, container: any): Promise<ReactComponent> 
  * loaded asynchronously.
  *
  * @param element	{ReactElement}		The React element to render
+ * @param context	{MaybePromise}		A promise that contains the context for elements
+ *										being rendered
  *
  * @return			{Promise<string>}	A promise that calls .then after the initial state is loaded
  *										and contains that value from string React.renderToString
  */
-function renderToString(element: ReactElement): Promise<string> {
-	return getInitialState(element)
-			.then((initialState) => {
-				return React.renderToString(React.cloneElement(element, { initialState }));
-			});
+function renderToString(element: ReactElement, context: ?MaybePromise): Promise<string> {
+	var contextPromise = Promise.resolve(context);
+	return getElementWithContextAndInitialState(element, contextPromise, getInitialState(element))
+			.then(
+				(elemt) => React.renderToString(elemt)
+			);
 }
 
 /**
@@ -44,21 +51,40 @@ function renderToString(element: ReactElement): Promise<string> {
  * loaded asynchronously.
  *
  * @param element	{ReactElement}		The React element to render
+ * @param context	{MaybePromise}		A promise that contains the context for elements
+ *										being rendered
  *
  * @return			{Promise<string>}	A promise that calls .then after the initial state is loaded
  *										and contains that value from string 
  *										React.renderToStaticMarkup
  */
-function renderToStaticMarkup(element: ReactElement): Promise<string> {
-	return getInitialState(element)
-			.then((initialState) => {
-				return React.renderToStaticMarkup(React.cloneElement(element, { initialState }));
-			});
+function renderToStaticMarkup(element: ReactElement, context: ?MaybePromise): Promise<string> {
+	var contextPromise = Promise.resolve(context);
+	return getElementWithContextAndInitialState(element, contextPromise, getInitialState(element))
+			.then(
+				(elemt) => React.renderToStaticMarkup(elemt)
+			);
 }
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Helper functions ---
 /*------------------------------------------------------------------------------------------------*/
+function getElementWithContextAndInitialState(	element				: ReactElement, 
+												contextPromise		: Promise, 
+												initialStatePromise	: Promise		)
+																	: Promise<ReactElement>	{
+	return Promise.all([contextPromise, initialStatePromise])
+			.then((results) =>	{
+				return React.cloneElement(element, {
+					_context: results[0],
+					_initialState: results[1]
+				});
+			})
+			.catch((err) => {
+				return React.cloneElement(element, { _error: err });
+			});
+}
+
 function getInitialState(element: ReactElement): Promise {
 	if(!element.type.getAsyncInitialState) return Promise.reject(new Error('No Initial State'));
 	

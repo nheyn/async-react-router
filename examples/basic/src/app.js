@@ -2,8 +2,8 @@ require('babel/polyfill');
 
 var React = require('react');
 var Router = require('react-router');
-var { AsyncReact, AsyncRouter } = require('async-react-router');
-var { route } = require('./route.js');
+var { AsyncReact, AsyncRouter, contextWrapper } = require('async-react-router');
+var route = require('./route.js');
 var DataSource = require('./dataSource.js');
 
 // Sever connection
@@ -36,18 +36,18 @@ var send = (url, payload, errorMessage = 'Ajax Error') => {
 };
 
 // Data Lookup / Action Dispatcher
+var dataSource = new DataSource();
 var lookup = (query) => send('/lookup', query, 'Error looking up data');
 var dispatch = (payload) => send('/action', payload, 'Error performing action');
 
 // Render the page for the given route
 window.onload = () => {
-	AsyncRouter.run(route, Router.HistoryLocation, (Handler, state) => {
-		var componentPromise = AsyncReact.render(
-			<Handler dataSource={new DataSource()} lookup={lookup} dispatch={dispatch} />,
-			document.getElementById('react-element')
-		);
-		componentPromise
+	var reactElement = document.getElementById('react-element')
+	var props = { dataSource, lookup, dispatch };
+	var currRoute = route.makeRoute({lookupHandler: () => null, actionHanlder: () => null});
+	AsyncRouter.run(currRoute, Router.HistoryLocation, (Handler, state) => {
+		AsyncReact.render(<Handler {...props} />, reactElement, { url: window.location.pathname })
 			.then(() => {/* If the component is needed */})
-			.catch((err) => { throw err });
+			.catch((err) => { console.log('Render Error:', err, err.stack); });
 	});
 };

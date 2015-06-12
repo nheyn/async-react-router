@@ -13,7 +13,7 @@ var React = require('react');
 type AsyncInitialStateMixinType = { getInitialState: () => {[key: string]: any}; };
 var AsyncInitialStateMixin: AsyncInitialStateMixinType = {
 	getInitialState() {
-		return this.props.initialState? this.props.initialState: {};
+		return this.props._initialState? this.props._initialState: {};
 	}
 };
 

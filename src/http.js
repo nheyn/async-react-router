@@ -9,71 +9,59 @@ var AsyncReact = require('./asyncReact.js');
 var AsyncRouter = require('./asyncReactRouter.js');
 
 /*------------------------------------------------------------------------------------------------*/
-//	--- Constants ---
-/*------------------------------------------------------------------------------------------------*/
-var APP_URI = '/app.js';
-var STATICS_URI = '/statics';
-var LOOKUP_URI = '/lookup';
-var ACTION_URI = '/action';
-
-/*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
 /*------------------------------------------------------------------------------------------------*/
 /**
  * Create a new http server to serve a React Router Website.
  *
- * @param settings	{ReactHttpSettings}	The settings for the server
- *			route 				{ReactRouterRoute}		The react router root for the site
- *			staticFileDirectory	{string}				The directory that contains static files
+ * @param getSettings	{ReactHttpSettingsFunction}	A function that returns the server settings:
+ *			route 				{ReactRouterRoute}	The react router root for the site
  *			htmlTemplate 		{string}				The html template string, where '<react />'
  *														is replaced with the component rendered for
  *														the root
- *			props				{[key: string]: any}	The props to send to the Handlers
- *			lookupHandler?: 	{HttpHandlerFunction}	A function to call when data is requested by
- *														the client
- *			actionHandler?: 	{HttpHandlerFunction}	A function to call when an action is
- *														preformed by the client
+ *			handleError			{Function}				Called with errors emitted by the server
+ *			props				{Object}				The props to send to the outer Handler
+ *			context				{Object}				the context to send to the Components
  */
 type ReactHttpSettings = {
 	route: ReactRouterRoute;
-	staticFileDirectory: string;
 	htmlTemplate: string;
-	props?: {[key: string]: any};
-	lookupHandler?: HttpHandlerFunction;
-	actionHandler?: HttpHandlerFunction;
+	handleError: (request: HttpIncomingMessage, response: HttpServerResponse, err: Error) => void;
+	props?: Object;
+	context?: Object;
 };
-function createServer(settings: ReactHttpSettings): HttpServer {
+function createServer(getSettings: ReactHttpSettingsFunction): HttpServer {
 	return http.createServer((request, response) => {
-		var requestHandler = new ReactRouterRequestHandler({
-			request: request,
-			response: response,
-			serverSettings: settings
-		});
-		requestHandler.handleRequest();
+		Promise.resolve(getSettings(request, response))
+			.then((settings) => {
+				var requestHandler = new ReactRouterRequestHandler({ request, response, settings });
+				requestHandler.handleRequest();
+			})
+			.catch((err) => { throw err });
 	});
 }
 
 /*------------------------------------------------------------------------------------------------*/
-//	--- React Router Http Request Handler Class ---
+//	--- React Router Http Request Handler ---
 /*------------------------------------------------------------------------------------------------*/
 /**
  * A class that handles a http request for the react-router server.
  *
  * @param settings	{ReactRouterRequestHandler}	The settings for the request handler
- *			request			{HttpIncomingMessage}	The http request to handle
- *			response		{HttpServerResponse}	The http response to send results to
- *			serverSettings	{ReactHttpSetting}		The settings for react-router server
+ *			request		{HttpIncomingMessage}	The http request to handle
+ *			response	{HttpServerResponse}	The http response to send results to
+ *			settings	{ReactHttpSetting}		The settings for react-router server
  *														(see createServer documentation for details)
  */
 type ReactRouterRequestHandlerSettings = {
 	request: HttpIncomingMessage;
 	response: HttpServerResponse;
-	serverSettings: ReactHttpSettings;
+	settings: ReactHttpSettings;
 };
 function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
-	this._severSettings = settings.serverSettings;
+	this._settings = settings.settings;
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -83,85 +71,56 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
  * Handle the request given in the constructor.
  */
 ReactRouterRequestHandler.prototype.handleRequest = function() {
-	var urlStartsWith = (pre) => this._request.url.startsWith(pre);
-	
-	//TODO
-	/*if(urlStartsWith('/app.js'))		this._handleClientAppRequest();
-	else*/ 
+	// Get Handler for the current route
+	AsyncRouter.run(this._settings.route, this._request.url, (Handler, state) => {
+		if(!state.routes || (Array.isArray(state.routes) && state.routes.length === 0)) {
+			this._handleError(new Error('No route'));
+			return;
+		}
 
-	// Check type of request
-	if(urlStartsWith(STATICS_URI))		this._handleStaticFile();
-	else if(urlStartsWith(LOOKUP_URI))	this._handleLookup();
-	else if(urlStartsWith(ACTION_URI))	this._handleAction();
-	else								this._handleInitalPageLoad();
+		// Check type of request
+		try {
+			var InnerHandler = state.routes[state.routes.length-1].handler;
+			if(InnerHandler.isHttpRequestHandler)	this._handleRequest(InnerHandler);
+			else									this._handleInitalPageLoad(Handler);
+		}
+		catch(err) {
+			this._handleError(err);
+		}
+	});
 };
 
 /*------------------------------------------------------------------------------------------------*/
 //	React Router Http Request Handler 'Private' Methods
 /*------------------------------------------------------------------------------------------------*/
 /**
- * Handle a request for the client side javascript for this app.
- *
-ReactRouterRequestHandler.prototype._handleClientAppRequest = function() {
-	this._sendStaticFile('./app.js', this._response);
-};//*/
-
-/**
- * Handle a request for a static file.
+ * Handle request handled by RequestHandlers.
  */
-ReactRouterRequestHandler.prototype._handleStaticFile = function() {
-	// Get file Path
-	var fileName = this._request.url.substring(STATICS_URI.length);
-	var filePath = path.join(this._severSettings.staticFileDirectory, fileName);
-
-	// Send File
-	this._sendStaticFile(filePath, this._response);
+ReactRouterRequestHandler.prototype._handleRequest = function(InnerHandler: any) {
+	InnerHandler.handle(this._request, this._response);
 };
 
 /**
- * Handle a request for data lookup.
+ * Handle request for the initial page load.
  */
-ReactRouterRequestHandler.prototype._handleLookup = function() {
-	if(!this._severSettings.lookupHandler) {
-		this._handleError(new Error('Unable to do any lookups'));
-		return;
-	}
+ReactRouterRequestHandler.prototype._handleInitalPageLoad = function(Handler: any) {
+	var props = this._settings.props? this._settings.props: {}
+	var context = this._settings.context? this._settings.context: {};
 
-	this._severSettings.lookupHandler(this._request, this._response);
-};
-
-/**
- * Handle a client side action.
- */
-ReactRouterRequestHandler.prototype._handleAction = function() {
-	if(!this._severSettings.actionHandler) {
-		this._handleError(new Error('Unable to do any actions'));
-		return;
-	}
-
-	this._severSettings.actionHandler(this._request, this._response);
-};
-
-/**
- * Handle an initial page load request.
- */
-ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
-	// Get Handler for the current route
-	AsyncRouter.run(this._severSettings.route, this._request.url, (Handler, state) => {
-		// Render Element
-		var props = this._severSettings.props? this._severSettings.props: {}
-		AsyncReact.renderToString(<Handler {...props} />)	//ERROR, incorrect flow error
-			.then((reactHtml) => {
-				// Add rendered react to html file when both are completed
-				var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
-				this._response.write(htmlDoc); 
-				this._response.end();
-			})
-			.catch((err) => {
-				console.log('Render Error: ', err);
-				this._handleError(err);
-			});
-	});
+	AsyncReact.renderToString(<Handler {...props} />, context)
+		.then((reactHtml) => {
+			// Add rendered react element to html template
+			var htmlDoc = this._settings.htmlTemplate.replace('<react />', reactHtml);
+			
+			// Send Rendered Page
+			this._response.writeHead(200, {'Content-Type': 'text/html'});
+			this._response.write(htmlDoc); 
+			this._response.end();
+		})
+		.catch((err) => {
+			console.log('Render Error: ', err);
+			this._handleError(err);
+		});
 };
 
 /**
@@ -170,22 +129,20 @@ ReactRouterRequestHandler.prototype._handleInitalPageLoad = function() {
  * @param error {Error}	The error to handle
  */
 ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
-	//TODO, create response based on error
-	console.log(err, err.stack);
-	this._response.writeHead(500, {'Content-Type': 'application/json'});
-	this._response.write(JSON.stringify({
-		errors: [
-			{type: 'InternalServerError', message: `Error Message: ${err.message}`},
-		]
-	}));
-	this._response.end();
-};
+	if(!this._settings || this._settings.handleError) {
+		// In case handleError function isn't given
+		var errMsg = `Server Error[${this._request.url}]: ${err.message}`;
 
-ReactRouterRequestHandler.prototype._sendStaticFile = function(filePath: string) {
-	var readStream = fs.createReadStream(filePath);
-	readStream
-		.on('open', () => readStream.pipe(this._response, true)) //NOTE, true is for flowtype
-		.on('error', (err) => this._handleError(err));
+		// Send default error
+		console.log(errMsg, err.stack);
+		this._response.writeHeader(500);
+		this._response.write(errMsg);
+		this._response.end();
+
+		return;
+	}
+
+	this._settings.handleError(this._request, this._response, err);
 };
 
 /*------------------------------------------------------------------------------------------------*/
