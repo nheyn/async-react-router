@@ -9,44 +9,32 @@ var AsyncReact = require('./asyncReact.js');
 var AsyncRouter = require('./asyncReactRouter.js');
 
 /*------------------------------------------------------------------------------------------------*/
-//	--- Constants ---
-/*------------------------------------------------------------------------------------------------*/
-var APP_URI = '/app.js';
-var STATICS_URI = '/statics';
-var LOOKUP_URI = '/lookup';
-var ACTION_URI = '/action';
-
-/*------------------------------------------------------------------------------------------------*/
 //	--- Create Server Function ---
 /*------------------------------------------------------------------------------------------------*/
 /**
  * Create a new http server to serve a React Router Website.
  *
  * @param getSettings	{ReactHttpSettingsFunction}	A function that returns the server settings:
- *			route 				{ReactRouterRoute}		The react router root for the site
+ *			route 				{ReactRouterRoute}	The react router root for the site
  *			htmlTemplate 		{string}				The html template string, where '<react />'
  *														is replaced with the component rendered for
  *														the root
  *			handleError			{Function}				Called with errors emitted by the server
- *			props				{?[key: string]: any}	The props to send to the outer Handler
- *			context				{?[key: string]: any}	the context to send to the Components
+ *			props				{Object}				The props to send to the outer Handler
+ *			context				{Object}				the context to send to the Components
  */
 type ReactHttpSettings = {
 	route: ReactRouterRoute;
 	htmlTemplate: string;
-	handleError?: (request: HttpIncomingMessage, response: HttpServerResponse, err: Error) => void;
-	props?: {[key: string]: any};
-	context?: {[key: string]: any};
+	handleError: (request: HttpIncomingMessage, response: HttpServerResponse, err: Error) => void;
+	props?: Object;
+	context?: Object;
 };
 function createServer(getSettings: ReactHttpSettingsFunction): HttpServer {
 	return http.createServer((request, response) => {
 		Promise.resolve(getSettings(request, response))
 			.then((settings) => {
-				var requestHandler = new ReactRouterRequestHandler({
-					request: request,
-					response: response,
-					serverSettings: settings? settings: {}
-				});
+				var requestHandler = new ReactRouterRequestHandler({ request, response, settings });
 				requestHandler.handleRequest();
 			})
 			.catch((err) => { throw err });
@@ -60,20 +48,20 @@ function createServer(getSettings: ReactHttpSettingsFunction): HttpServer {
  * A class that handles a http request for the react-router server.
  *
  * @param settings	{ReactRouterRequestHandler}	The settings for the request handler
- *			request			{HttpIncomingMessage}	The http request to handle
- *			response		{HttpServerResponse}	The http response to send results to
- *			serverSettings	{ReactHttpSetting}		The settings for react-router server
+ *			request		{HttpIncomingMessage}	The http request to handle
+ *			response	{HttpServerResponse}	The http response to send results to
+ *			settings	{ReactHttpSetting}		The settings for react-router server
  *														(see createServer documentation for details)
  */
 type ReactRouterRequestHandlerSettings = {
 	request: HttpIncomingMessage;
 	response: HttpServerResponse;
-	serverSettings: ReactHttpSettings;
+	settings: ReactHttpSettings;
 };
 function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) {
 	this._request = settings.request;
 	this._response = settings.response;
-	this._severSettings = settings.serverSettings;
+	this._settings = settings.settings;
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -84,8 +72,8 @@ function ReactRouterRequestHandler(settings: ReactRouterRequestHandlerSettings) 
  */
 ReactRouterRequestHandler.prototype.handleRequest = function() {
 	// Get Handler for the current route
-	AsyncRouter.run(this._severSettings.route, this._request.url, (Handler, state) => {
-		if(!state.routes || state.routes.length === 0) {
+	AsyncRouter.run(this._settings.route, this._request.url, (Handler, state) => {
+		if(!state.routes || (Array.isArray(state.routes) && state.routes.length === 0)) {
 			this._handleError(new Error('No route'));
 			return;
 		}
@@ -116,22 +104,23 @@ ReactRouterRequestHandler.prototype._handleRequest = function(InnerHandler: any)
  * Handle request for the initial page load.
  */
 ReactRouterRequestHandler.prototype._handleInitalPageLoad = function(Handler: any) {
-	var props = this._severSettings.props? this._severSettings.props: {}
-	var context = this._severSettings.context? this._severSettings.context: {};
-	
-	React.withContext(context, () => {		//TODO, change from .withContext to .getChildContext
-		AsyncReact.renderToString(<Handler {...props} />)
-			.then((reactHtml) => {
-				// Add rendered react to html file when both are completed
-				var htmlDoc = this._severSettings.htmlTemplate.replace('<react />', reactHtml);
-				this._response.write(htmlDoc); 
-				this._response.end();
-			})
-			.catch((err) => {
-				console.log('Render Error: ', err);
-				this._handleError(err);
-			});
-	});
+	var props = this._settings.props? this._settings.props: {}
+	var context = this._settings.context? this._settings.context: {};
+
+	AsyncReact.renderToString(<Handler {...props} />, context)
+		.then((reactHtml) => {
+			// Add rendered react element to html template
+			var htmlDoc = this._settings.htmlTemplate.replace('<react />', reactHtml);
+			
+			// Send Rendered Page
+			this._response.writeHead(200, {'Content-Type': 'text/html'});
+			this._response.write(htmlDoc); 
+			this._response.end();
+		})
+		.catch((err) => {
+			console.log('Render Error: ', err);
+			this._handleError(err);
+		});
 };
 
 /**
@@ -140,9 +129,20 @@ ReactRouterRequestHandler.prototype._handleInitalPageLoad = function(Handler: an
  * @param error {Error}	The error to handle
  */
 ReactRouterRequestHandler.prototype._handleError = function(err: Error) {
-	if(!this._severSettings || this._severSettings.handleError) throw err;
+	if(!this._settings || this._settings.handleError) {
+		// In case handleError function isn't given
+		var errMsg = `Server Error[${this._request.url}]: ${err.message}`;
 
-	this._severSettings.handleError(this._request, this._response, err);
+		// Send default error
+		console.log(errMsg, err.stack);
+		this._response.writeHeader(500);
+		this._response.write(errMsg);
+		this._response.end();
+
+		return;
+	}
+
+	this._settings.handleError(this._request, this._response, err);
 };
 
 /*------------------------------------------------------------------------------------------------*/

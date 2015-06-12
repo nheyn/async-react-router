@@ -4,14 +4,12 @@ var AsyncReactRouter = require('async-react-router');
 
 // Test Site's Handlers
 var Page = React.createClass({
-	contextTypes: {
-        url: React.PropTypes.string.isRequired,
-    },
-	mixins: [AsyncReactRouter.AsyncInitialStateHandlerMixin],
+	// CONTEXT, test setting context
+	mixins: [AsyncReactRouter.AsyncInitialStateHandlerMixin, AsyncReactRouter.AsyncContextMixin],
 	render() {
 		return (
 			<div>
-				<h2>Site Heading: {this.context.url}</h2>
+				<h2>Site Heading</h2>
 				{/*<img alt="Some Image" src="/staticFiles?path=identicon.png" />*/}
 				<nav>
 					<ul>
@@ -80,11 +78,17 @@ var PageThree = React.createClass({
 					Promise.reject(new Error('No lookup function to use'));
 		}
 	},
+	contextTypes: {
+		// CONTEXT, test getting context
+		async: React.PropTypes.shape({
+			url: React.PropTypes.string.isRequired
+		}).isRequired
+	},
 	mixins: [AsyncReactRouter.AsyncInitialStateHandlerMixin],
 	render() {
 		return (
 			<div>
-				<h4>Page Three Header</h4>
+				<h4>Page Three Header <small>{this.context.async.url}</small></h4>
 				<article>
 					<textarea 
 						value={this.state.article? this.state.article: 'NO DATA'}
