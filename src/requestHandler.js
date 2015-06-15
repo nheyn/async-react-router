@@ -7,10 +7,15 @@ var fs = require('fs');
 
 type FileRequestConstructorType = {
 	path: string,
-	mimeTypes?: Map<string, string>,
-	mimeType?: string
+	fileTypes?: Map<string, FileType>,
+	fileType?: FileType
 };
 
+type FileType = {
+	mimeType: string,
+	encodeing: string
+};
+	
 /**
  * //TODO
  */
@@ -52,10 +57,10 @@ function createDirectoryRequestClass(settings: FileRequestConstructorType): Reac
 
 		// Send file
 		var fullPath = path.resolve(path.join(settings.path, pathFromQuery));
-		var handleFile = fileRequestHandlerFunctionFor(
-			fullPath,
-			settings.mimeType? settings.mimeType: getMimeType(fullPath, settings.mimeTypes)
-		);
+		var mimeType = settings.mimeType?
+						settings.mimeType:
+						getMimeType(fullPath, settings.mimeTypes)
+		var handleFile = fileRequestHandlerFunctionFor(fullPath, mimeType);
 		handleFile(request, response);
 	});
 }
@@ -98,14 +103,23 @@ function fileRequestHandlerFunctionFor(filePath: string, mimeType: string): Http
 	};
 }
 
-function getMimeType(filePath: string, mimeTypes: ?Map<string, string>): string {
-	if(!mimeTypes)	return 'text/plain';
+function getFileType(filePath: string, fileTypes: ?Map<string, FileType>): string {
+	if(!fileTypes)	return 'text/plain';
 
 	var ext = path.extname(filePath).slice(1);
-	return mimeTypes.has(ext)? 
-			mimeTypes.get(ext): 
+	return fileTypes.has(ext)? 
+			fileTypes.get(ext): 
 			'text/plain';
 }
+
+var defaultFileType: Map<string, FileType> = () => {
+	var types = new Map();
+
+	types.set()
+
+	return types;
+}();
+function getDefaultFileType()
 
 function openFile(filePath: string): Promise<string> {
 	return new Promise((resolve, reject) => {
