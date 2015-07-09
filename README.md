@@ -2,12 +2,11 @@
 *Async wrapper functions for react and react router*
 
 ###Wrapper Functions
-* Wrapper for React.render/.renderToString/.renderToStaticMarkup that allow Async Initial Data 
+* Wrapper for React.render/.renderToString/.renderToStaticMarkup that allow Async Initial Data
 * Wrapper for ReactRouter.run that allow Async Initial Data, when using React wrapper functions (see above)
-* Wrapper for http.createServer that creates a server for an isomorphic web apps (includes server side rendering for initial page load).
 
 ###Usage
-Add the static function, *getAsyncInitialState(props)*, and one of the mixins, **AsyncInitialStateMixin** or **AsyncInitialStateHandlerMixin**, to a react class. 
+Add the static function, *getAsyncInitialState(props)*, and one of the mixins, **AsyncInitialStateMixin** or **AsyncInitialStateHandlerMixin**, to a react class.
 This function will be passed the initial props and should return a promise that contains the initial state.
 
 Using the wrapper function (see bellow) and one of the mixins, will set the state of the component before it is rendered.

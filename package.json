@@ -1,6 +1,6 @@
 {
 	"name": "async-react-router",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "React Router wrapper that allows async initial data loading.",
 	"author": "Nick Heyn <nick@heyn.io>",
 	"main": "lib/index.js",
