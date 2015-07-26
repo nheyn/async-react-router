@@ -14,7 +14,7 @@ var React = require('react');
  * @param container	{DOM}						The DOM container to render the element in
  * @param context	{MaybePromise}				A promise that contains the context for elements
  *												being rendered
- * 
+ *
  * @return			{Promise<ReactComponent>}	A promise that contains the component returned from
  *												React.render
  */
@@ -22,11 +22,9 @@ function render(element: ReactElement, container: any, context: ?MaybePromise)
 																		: Promise<ReactComponent> {
 	var contextPromise = Promise.resolve(context);
 	return getElementWithContextAndInitialState(element, contextPromise, getInitialState(element))
-		.then(
-			(elemt) => React.render(elemt, container)
-		);
+			.then((elemt) => React.render(elemt, container));
 }
- 
+
 /**
  * Wrapper function for React.renderToString, which allows that initial state of the component to be
  * loaded asynchronously.
@@ -41,9 +39,7 @@ function render(element: ReactElement, container: any, context: ?MaybePromise)
 function renderToString(element: ReactElement, context: ?MaybePromise): Promise<string> {
 	var contextPromise = Promise.resolve(context);
 	return getElementWithContextAndInitialState(element, contextPromise, getInitialState(element))
-			.then(
-				(elemt) => React.renderToString(elemt)
-			);
+			.then((elemt) => React.renderToString(elemt));
 }
 
 /**
@@ -55,39 +51,30 @@ function renderToString(element: ReactElement, context: ?MaybePromise): Promise<
  *										being rendered
  *
  * @return			{Promise<string>}	A promise that calls .then after the initial state is loaded
- *										and contains that value from string 
+ *										and contains that value from string
  *										React.renderToStaticMarkup
  */
 function renderToStaticMarkup(element: ReactElement, context: ?MaybePromise): Promise<string> {
 	var contextPromise = Promise.resolve(context);
 	return getElementWithContextAndInitialState(element, contextPromise, getInitialState(element))
-			.then(
-				(elemt) => React.renderToStaticMarkup(elemt)
-			);
+			.then((elemt) => React.renderToStaticMarkup(elemt));
 }
 
 /*------------------------------------------------------------------------------------------------*/
 //	--- Helper functions ---
 /*------------------------------------------------------------------------------------------------*/
-function getElementWithContextAndInitialState(	element				: ReactElement, 
-												contextPromise		: Promise, 
+function getElementWithContextAndInitialState(	element				: ReactElement,
+												contextPromise		: Promise,
 												initialStatePromise	: Promise		)
 																	: Promise<ReactElement>	{
-	return Promise.all([contextPromise, initialStatePromise])
-			.then((results) =>	{
-				return React.cloneElement(element, {
-					_context: results[0],
-					_initialState: results[1]
-				});
-			})
-			.catch((err) => {
-				return React.cloneElement(element, { _error: err });
-			});
+	return Promise.all([contextPromise, initialStatePromise]).then((results) =>	{
+		return React.cloneElement(element, { _context: results[0], _initialState: results[1] });
+	});
 }
 
 function getInitialState(element: ReactElement): Promise {
 	if(!element.type.getAsyncInitialState) return Promise.reject(new Error('No Initial State'));
-	
+
 	var asyncInitialState = element.type.getAsyncInitialState(element.props);
 	return Promise.resolve(asyncInitialState).then((initialState) => {
 		// Get parts of state that are promise

@@ -19,27 +19,34 @@ var Router = require('react-router');
 function run(route: ReactRouterRoute, location: any, callback: ReactRouterCallback) {
 	Router.run(route, location, (Handler, state) => {
 		// Get all handlers with getAsyncInitialState method in the current route
-		var asyncHandlers = state.routes
-								.map(
-									(route) => route.handler
-								)
-								.filter(
-									(handler) => (handler && handler.getAsyncInitialState)
-								);
+		var getHandler = (route) => route.handler;
+		var hasAsyncInitialState = (handler) => handler&&handler.getAsyncInitialState? true: false;
+
+		var initalStateHandlers = state.routes.map(getHandler).filter(hasAsyncInitialState);
 
 		// Add getAsyncInitialState method to the to level handler
 		Handler.getAsyncInitialState = (props) => {
-			return Promise.all( asyncHandlers.map((handler) => handler.getAsyncInitialState(props)))
-					.then((resultsArray) => {
-						var resultsObj = {};
-						resultsArray.forEach((result, i) => {
-							var key = asyncHandlers[i].displayName?
-										asyncHandlers[i].displayName:
-										i;
-							resultsObj[key] = result;
-						});
-						return resultsObj;
-					});
+			var initialStatePromises = initalStateHandlers.map((handler, i) => {
+				return handler.getAsyncInitialState(props);
+			});
+
+			return Promise.all(initialStatePromises).then((initialStateArray) => {
+				var initialStateObj = {};
+				for(var i=0; i<initialStateArray.length; i++) {
+					if(!initalStateHandlers[i].displayName) {
+						throw new Error(
+							'All React Router handler components that use getAsyncInitialState ' +
+							'must have a displayName'
+						);
+					}
+
+					var displayName = initalStateHandlers[i].displayName;
+					var initialState = initialStateArray[i];
+
+					initialStateObj[displayName] = initialState;
+				}
+				return initialStateObj;
+			});
 		};
 
 		// Call callbacks, with updated Handler

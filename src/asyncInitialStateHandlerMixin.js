@@ -11,8 +11,8 @@ var { RouteHandler } = require('react-router');
  * A mixin to add to components that get their initial state using the static getAsyncInitialState
  * method.
  */
-type AsyncInitialStateHandlerMixinType = { 
-	getInitialState: () => {[key: string]: any}; 
+type AsyncInitialStateHandlerMixinType = {
+	getInitialState: () => {[key: string]: any};
 	getSubRouteHandler: (props?: {[key: string]: any}) => ReactElement;
 };
 var AsyncInitialStateHandlerMixin: AsyncInitialStateHandlerMixinType = {
@@ -26,7 +26,6 @@ var AsyncInitialStateHandlerMixin: AsyncInitialStateHandlerMixinType = {
 		var handlerProps = {};
 		for(var key in props) handlerProps[key] = props[key];
 		if(this.props._initialState) handlerProps._initialState = this.props._initialState;
-		if(this.props._error) handlerProps._error = this.props._error;
 
 		return <RouteHandler {...handlerProps} />;
 	}
