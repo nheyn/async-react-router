@@ -1,11 +1,11 @@
-#Async React Router
+# Async React Router
 *Async wrapper functions for react and react router*
 
-###Wrapper Functions
+### Wrapper Functions
 * Wrapper for React.render/.renderToString/.renderToStaticMarkup that allow Async Initial Data
 * Wrapper for ReactRouter.run that allow Async Initial Data, when using React wrapper functions (see above)
 
-###Usage
+### Usage
 Add the static function, *getAsyncInitialState(props)*, and one of the mixins, **AsyncInitialStateMixin** or **AsyncInitialStateHandlerMixin**, to a react class.
 This function will be passed the initial props and should return a promise that contains the initial state.
 
@@ -20,17 +20,17 @@ The component given to the *AsyncReact* render functions, or the root route Hand
 
 Any unhanded error will be in the promise returned by one of the wrapper functions.
 
-###Example
+### Example
 See /examples/basic/ for a simple example web site that uses AsyncReactRouter.http.createServer
 
-###Tests
+### Tests
 FIXED: Issue using polyfill with jest (https://github.com/babel/babel-jest/issues/20)
 TODO: Write the tests
 
-###Documentation
+### Documentation
 TODO: Get documentation from code
 
-###Plans
+### Plans
 * Write tests
 * Get documentation from code
 * Generate app.js (see /examples/basic/src/app.js) in *createServer()* function
