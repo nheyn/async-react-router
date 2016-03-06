@@ -1,3 +1,6 @@
+**NOTE**
+*This project is no longer supported, react-router's initial state SHOULD NOT be loaded asynchronously (for ux reasons)*
+
 # Async React Router
 *Async wrapper functions for react and react router*
 
